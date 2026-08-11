@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>プロ仕様！マルチ文字アイコンメーカー</title>
+    <title>プロ仕様！マルチ文字＆画像アイコンメーカー</title>
     <style>
         /* --- 全体のデザイン（クリエイティブなダークテーマ） --- */
         :root {
@@ -87,7 +87,7 @@
             box-sizing: border-box;
         }
 
-        /* 文字追加用の特殊横並び */
+        /* 文字追加・画像アップロード用の特殊横並び */
         .add-form-wrapper {
             display: flex;
             align-items: center;
@@ -119,7 +119,7 @@
             font-size: 0.85rem;
         }
 
-        /* 選択中の文字表示バッジ */
+        /* 選択中の要素表示バッジ */
         .selected-badge {
             font-size: 0.9rem;
             color: #ff9f43;
@@ -205,8 +205,8 @@
 </head>
 <body>
 
-    <h1>🎨 プロ仕様！個別カスタムアイコンメーカー</h1>
-    <p>文字スケール制限大幅UP！保存するPNGファイル名も自由に入力できるやで！</p>
+    <h1>🎨 プロ仕様！画像＆文字カスタムアイコンメーカー</h1>
+    <p>画像をアップロードして自由にレイアウトできるで！保存ファイル名も自由自在！</p>
 
     <div class="workspace">
         
@@ -218,6 +218,11 @@
             </div>
 
             <div class="control-group">
+                <label>🖼️ 画像をアップロードして追加：</label>
+                <input type="file" id="imageUpload" accept="image/*" style="width:100%; color: #ccc; font-size: 0.85rem;">
+            </div>
+
+            <div class="control-group">
                 <label>➕ 文字・絵文字を追加：</label>
                 <div class="add-form-wrapper">
                     <input type="text" id="charInput" value="👑" placeholder="文字や絵文字">
@@ -226,18 +231,20 @@
             </div>
 
             <div class="control-group" style="border: 1px solid #444;">
-                <div class="selected-badge" id="selectedLabel">選択中: なし (キャンバスの文字をクリック！)</div>
+                <div class="selected-badge" id="selectedLabel">選択中: なし (要素をクリック！)</div>
                 
-                <label>① 文字の色（絵文字には無効）：</label>
-                <input type="color" id="charColor" value="#00ecbc" style="width:100%; height:35px; border:none; cursor:pointer; margin-bottom:12px;">
+                <div id="textOnlyControls">
+                    <label>① 文字の色（絵文字には無効）：</label>
+                    <input type="color" id="charColor" value="#00ecbc" style="width:100%; height:35px; border:none; cursor:pointer; margin-bottom:12px;">
+                </div>
 
-                <label>② 文字の大きさ (最大600)：<span class="range-val" id="scaleVal">150px</span></label>
+                <label id="scaleLabel">② 大きさ：<span class="range-val" id="scaleVal">150px</span></label>
                 <input type="range" id="scaleSlider" min="20" max="600" value="150">
 
                 <label style="margin-top: 12px;">③ 回転角度 (-180° 〜 180°)：<span class="range-val" id="rotateVal">0°</span></label>
                 <input type="range" id="rotateSlider" min="-180" max="180" value="0">
 
-                <button class="btn-delete" id="deleteBtn">❌ この文字を消去する</button>
+                <button class="btn-delete" id="deleteBtn">❌ この要素を消去する</button>
             </div>
 
             <div class="save-zone">
@@ -253,9 +260,9 @@
             </div>
             <div class="hint">
                 【操作方法】<br>
-                ✨ **文字をクリック**：その文字をカスタム対象に選択！<br>
-                ✨ **文字をドラッグ**：選んだ文字を別々に移動 ↕↔<br>
-                ✨ **スライダー**：選んだ文字の回転・ドデカ拡大を個別調整！
+                ✨ **要素をクリック**：文字や画像をカスタム対象に選択！<br>
+                ✨ **要素をドラッグ**：選んだものを別々に移動 ↕↔<br>
+                ✨ **スライダー**：選んだものの回転・サイズを個別調整！
             </div>
         </div>
 
@@ -267,10 +274,13 @@
 
         // 要素の取得
         const bgColorInput = document.getElementById('bgColor');
+        const imageUpload = document.getElementById('imageUpload');
         const charInput = document.getElementById('charInput');
         const addBtn = document.getElementById('addBtn');
         const selectedLabel = document.getElementById('selectedLabel');
+        const textOnlyControls = document.getElementById('textOnlyControls');
         const charColorInput = document.getElementById('charColor');
+        const scaleLabel = document.getElementById('scaleLabel');
         const scaleSlider = document.getElementById('scaleSlider');
         const rotateSlider = document.getElementById('rotateSlider');
         const scaleVal = document.getElementById('scaleVal');
@@ -282,11 +292,11 @@
         // 全体の背景色
         let backgroundColor = '#0f172a';
 
-        // 初期配置の文字データ（今回はちょっとドデカく配置！）
-        let charLayers = [
-            { id: 1, text: 'A', x: 160, y: 240, scale: 220, rotation: -15, color: '#ff9f43' },
-            { id: 2, text: 'Z', x: 340, y: 260, scale: 220, rotation: 15, color: '#00ecbc' },
-            { id: 3, text: '👑', x: 256, y: 120, scale: 140, rotation: 0, color: '#ffffff' }
+        // レイヤーデータ（文字と画像の両方を管理！）
+        let layers = [
+            { id: 1, type: 'text', text: 'A', x: 160, y: 240, scale: 220, rotation: -15, color: '#ff9f43' },
+            { id: 2, type: 'text', text: 'Z', x: 340, y: 260, scale: 220, rotation: 15, color: '#00ecbc' },
+            { id: 3, type: 'text', text: '👑', x: 256, y: 120, scale: 140, rotation: 0, color: '#ffffff' }
         ];
 
         let selectedId = 1; 
@@ -300,22 +310,30 @@
             ctx.fillStyle = backgroundColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 全レイヤー描画
-            charLayers.forEach(layer => {
+            // 全レイヤー描画（文字・画像）
+            layers.forEach(layer => {
                 ctx.save();
                 
                 ctx.translate(layer.x, layer.y);
                 ctx.rotate((layer.rotation * Math.PI) / 180);
 
-                ctx.font = `bold ${layer.scale}px 'Helvetica Neue', Arial, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = layer.color;
+                if (layer.type === 'text') {
+                    ctx.font = `bold ${layer.scale}px 'Helvetica Neue', Arial, sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = layer.color;
+                    ctx.fillText(layer.text, 0, 0);
+                } else if (layer.type === 'image' && layer.imgObj) {
+                    const w = layer.scale;
+                    const h = (layer.imgObj.height / layer.imgObj.width) * w;
+                    ctx.drawImage(layer.imgObj, -w / 2, -h / 2, w, h);
+                }
 
-                // 選択中の文字には、ガイドの点線円を描く
+                // 選択中の要素には、ガイドの点線円を描く
                 if (layer.id === selectedId) {
                     ctx.beginPath();
-                    ctx.arc(0, 0, layer.scale / 1.4, 0, Math.PI * 2);
+                    const radius = layer.type === 'text' ? layer.scale / 1.4 : layer.scale / 1.5;
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
                     ctx.strokeStyle = 'rgba(255, 159, 67, 0.7)';
                     ctx.lineWidth = 3;
                     ctx.setLineDash([6, 6]);
@@ -323,38 +341,71 @@
                     ctx.setLineDash([]);
                 }
 
-                ctx.fillText(layer.text, 0, 0);
                 ctx.restore();
             });
         }
 
         // --- UI表示とスライダー・数値の同期 ---
         function updateUI() {
-            const currentLayer = charLayers.find(l => l.id === selectedId);
+            const currentLayer = layers.find(l => l.id === selectedId);
             if (currentLayer) {
-                selectedLabel.textContent = `選択中:「${currentLayer.text}」`;
-                charColorInput.value = currentLayer.color;
+                if (currentLayer.type === 'text') {
+                    selectedLabel.textContent = `選択中(文字):「${currentLayer.text}」`;
+                    textOnlyControls.style.display = 'block';
+                    charColorInput.value = currentLayer.color;
+                    scaleLabel.innerHTML = `② 文字の大きさ (最大600)：<span class="range-val" id="scaleVal">${currentLayer.scale}px</span>`;
+                } else {
+                    selectedLabel.textContent = `選択中(画像)`;
+                    textOnlyControls.style.display = 'none';
+                    scaleLabel.innerHTML = `② 画像の横幅 (最大600)：<span class="range-val" id="scaleVal">${currentLayer.scale}px</span>`;
+                }
                 
                 scaleSlider.value = currentLayer.scale;
-                scaleVal.textContent = `${currentLayer.scale}px`;
-
                 rotateSlider.value = currentLayer.rotation;
                 rotateVal.textContent = `${currentLayer.rotation}°`;
                 
-                charColorInput.disabled = false;
                 scaleSlider.disabled = false;
                 rotateSlider.disabled = false;
                 deleteBtn.disabled = false;
             } else {
-                selectedLabel.textContent = `選択中: なし (文字をクリックしてな)`;
+                selectedLabel.textContent = `選択中: なし (要素をクリックしてな)`;
                 scaleVal.textContent = `---`;
                 rotateVal.textContent = `---`;
-                charColorInput.disabled = true;
+                textOnlyControls.style.display = 'block';
                 scaleSlider.disabled = true;
                 rotateSlider.disabled = true;
                 deleteBtn.disabled = true;
             }
         }
+
+        // --- 画像アップロード処理 ---
+        imageUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const newLayer = {
+                        id: Date.now(),
+                        type: 'image',
+                        imgObj: img,
+                        x: 256,
+                        y: 256,
+                        scale: 200, // 初期サイズ
+                        rotation: 0
+                    };
+                    layers.push(newLayer);
+                    selectedId = newLayer.id;
+                    imageUpload.value = ''; // リセット
+                    updateUI();
+                    drawIcon();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
 
         // --- 文字追加 ---
         addBtn.addEventListener('click', () => {
@@ -363,15 +414,16 @@
 
             const newLayer = {
                 id: Date.now(),
+                type: 'text',
                 text: val,
                 x: 256,
                 y: 256,
-                scale: 150, // 初期サイズもちょっと大きめに
+                scale: 150,
                 rotation: 0,
                 color: '#ffffff'
             };
 
-            charLayers.push(newLayer);
+            layers.push(newLayer);
             selectedId = newLayer.id;
             charInput.value = '';
             
@@ -387,13 +439,14 @@
 
         // スライダー連動
         function handleSliderInput() {
-            const currentLayer = charLayers.find(l => l.id === selectedId);
+            const currentLayer = layers.find(l => l.id === selectedId);
             if (currentLayer) {
-                currentLayer.color = charColorInput.value;
+                if (currentLayer.type === 'text') {
+                    currentLayer.color = charColorInput.value;
+                }
                 currentLayer.scale = parseInt(scaleSlider.value);
                 currentLayer.rotation = parseInt(rotateSlider.value);
                 
-                // 数値表示のテキストもリアルタイム更新や！
                 scaleVal.textContent = `${currentLayer.scale}px`;
                 rotateVal.textContent = `${currentLayer.rotation}°`;
                 
@@ -405,10 +458,10 @@
         scaleSlider.addEventListener('input', handleSliderInput);
         rotateSlider.addEventListener('input', handleSliderInput);
 
-        // 文字削除
+        // 要素削除
         deleteBtn.addEventListener('click', () => {
-            charLayers = charLayers.filter(l => l.id !== selectedId);
-            selectedId = charLayers.length > 0 ? charLayers[0].id : null;
+            layers = layers.filter(l => l.id !== selectedId);
+            selectedId = layers.length > 0 ? layers[0].id : null;
             updateUI();
             drawIcon();
         });
@@ -428,11 +481,10 @@
             const coords = getCanvasCoords(e);
             let hitTarget = null;
             
-            for (let i = charLayers.length - 1; i >= 0; i--) {
-                const layer = charLayers[i];
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i];
                 const distance = Math.sqrt((coords.x - layer.x) ** 2 + (coords.y - layer.y) ** 2);
                 
-                // ヒットエリアもスケールに合わせて柔軟に計算
                 if (distance < layer.scale / 1.1) {
                     hitTarget = layer;
                     break;
@@ -473,36 +525,21 @@
         canvas.addEventListener('touchmove', moveDrag, { passive: false });
         canvas.addEventListener('touchend', stopDrag);
 
-
-        // --- 💾 PNG保存処理（ファイル名カスタム入力対応！） ---
+        // --- 💾 PNG保存処理 ---
         saveBtn.addEventListener('click', () => {
-            // 保存時は一時的にガイドの点線を非表示にする
             const tempSelectedId = selectedId;
             selectedId = null; 
             drawIcon();
 
-            // Canvasから画像データを生成
             const dataURL = canvas.toDataURL('image/png');
-            
-            // ファイル名入力欄からテキストを取得（前後の余計な空白はカット）
             let inputName = fileNameInput.value.trim();
-            let finalFileName = '';
+            let finalFileName = inputName ? `${inputName}.png` : `custom-icon-${Date.now()}.png`;
 
-            if (inputName) {
-                // あんたが名前を入力してくれたらそれを使う！（拡張子は自動付与）
-                finalFileName = `${inputName}.png`;
-            } else {
-                // 空欄やったら、今まで通りタイムスタンプで被らん名前を自動生成！
-                finalFileName = `custom-icon-${Date.now()}.png`;
-            }
-
-            // ダウンロード用リンクを作って発火！
             const link = document.createElement('a');
             link.download = finalFileName;
             link.href = dataURL;
             link.click();
 
-            // 保存完了後に選択状態を復元して再描画
             selectedId = tempSelectedId;
             drawIcon();
         });
