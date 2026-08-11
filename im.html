@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>プロ仕様！マルチ文字＆画像アイコンメーカー</title>
+    <title>プロ仕様！画像・図形・文字カスタムアイコンメーカー</title>
     <style>
-        /* --- 全体のデザイン（クリエイティブなダークテーマ） --- */
         :root {
             --bg-color: #121214;
             --panel-bg: #1e1e24;
@@ -39,7 +38,6 @@
             color: #ccc;
         }
 
-        /* ワークスペース（横並びレイアウト） */
         .workspace {
             display: flex;
             gap: 30px;
@@ -50,7 +48,6 @@
             flex-wrap: wrap;
         }
 
-        /* --- 左側：コントロールパネル --- */
         .control-panel {
             background-color: var(--panel-bg);
             padding: 20px;
@@ -76,7 +73,7 @@
             color: #a4b0be;
         }
 
-        .control-group input[type="text"] {
+        .control-group input[type="text"], .control-group select {
             width: 100%;
             padding: 10px;
             background: #121214;
@@ -87,13 +84,12 @@
             box-sizing: border-box;
         }
 
-        /* 文字追加・画像アップロード用の特殊横並び */
         .add-form-wrapper {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .add-form-wrapper input[type="text"] {
+        .add-form-wrapper input[type="text"], .add-form-wrapper select {
             flex: 1;
         }
 
@@ -119,7 +115,6 @@
             font-size: 0.85rem;
         }
 
-        /* 選択中の要素表示バッジ */
         .selected-badge {
             font-size: 0.9rem;
             color: #ff9f43;
@@ -132,7 +127,6 @@
             border: 1px dashed #ff9f43;
         }
 
-        /* 保存エリア */
         .save-zone {
             background: #1a1a24;
             border: 2px solid #ff9f43;
@@ -170,7 +164,6 @@
             font-weight: bold;
         }
 
-        /* --- 右側：キャンバス表示エリア --- */
         .canvas-area {
             display: flex;
             flex-direction: column;
@@ -192,7 +185,6 @@
             display: block;
         }
 
-        /* 操作のヒント */
         .hint {
             margin-top: 12px;
             font-size: 0.8rem;
@@ -205,8 +197,8 @@
 </head>
 <body>
 
-    <h1>🎨 プロ仕様！画像＆文字カスタムアイコンメーカー</h1>
-    <p>画像をアップロードして自由にレイアウトできるで！保存ファイル名も自由自在！</p>
+    <h1>🎨 超万能！画像・図形・文字アイコンメーカー</h1>
+    <p>横幅・縦幅の個別調整や、図形の追加も自由自在やで！(≧∇≦)b</p>
 
     <div class="workspace">
         
@@ -223,25 +215,42 @@
             </div>
 
             <div class="control-group">
+                <label>🔷 図形を追加：</label>
+                <div class="add-form-wrapper">
+                    <select id="shapeSelect">
+                        <option value="rect">四角形</option>
+                        <option value="circle">円</option>
+                        <option value="triangle">三角形</option>
+                    </select>
+                    <button class="btn-add" id="addShapeBtn">図形追加</button>
+                </div>
+            </div>
+
+            <div class="control-group">
                 <label>➕ 文字・絵文字を追加：</label>
                 <div class="add-form-wrapper">
                     <input type="text" id="charInput" value="👑" placeholder="文字や絵文字">
-                    <button class="btn-add" id="addBtn">追加する</button>
+                    <button class="btn-add" id="addBtn">文字追加</button>
                 </div>
             </div>
 
             <div class="control-group" style="border: 1px solid #444;">
                 <div class="selected-badge" id="selectedLabel">選択中: なし (要素をクリック！)</div>
                 
-                <div id="textOnlyControls">
-                    <label>① 文字の色（絵文字には無効）：</label>
-                    <input type="color" id="charColor" value="#00ecbc" style="width:100%; height:35px; border:none; cursor:pointer; margin-bottom:12px;">
+                <div id="colorControls">
+                    <label id="colorLabel">① 色（カラー）：</label>
+                    <input type="color" id="elementColor" value="#00ecbc" style="width:100%; height:35px; border:none; cursor:pointer; margin-bottom:12px;">
                 </div>
 
-                <label id="scaleLabel">② 大きさ：<span class="range-val" id="scaleVal">150px</span></label>
-                <input type="range" id="scaleSlider" min="20" max="600" value="150">
+                <label id="widthLabel">② 横幅 (Width)：<span class="range-val" id="widthVal">150px</span></label>
+                <input type="range" id="widthSlider" min="10" max="600" value="150">
 
-                <label style="margin-top: 12px;">③ 回転角度 (-180° 〜 180°)：<span class="range-val" id="rotateVal">0°</span></label>
+                <div id="heightControlGroup" style="margin-top: 12px;">
+                    <label id="heightLabel">③ 縦幅 (Height)：<span class="range-val" id="heightVal">150px</span></label>
+                    <input type="range" id="heightSlider" min="10" max="600" value="150">
+                </div>
+
+                <label style="margin-top: 12px;">④ 回転角度 (-180° 〜 180°)：<span class="range-val" id="rotateVal">0°</span></label>
                 <input type="range" id="rotateSlider" min="-180" max="180" value="0">
 
                 <button class="btn-delete" id="deleteBtn">❌ この要素を消去する</button>
@@ -249,7 +258,7 @@
 
             <div class="save-zone">
                 <label style="font-size: 0.85rem; font-weight: bold; color: #ff9f43; display: block; margin-bottom: 6px;">💾 保存するPNGのファイル名：</label>
-                <input type="text" id="fileNameInput" placeholder="例: my_cool_icon (空欄なら自動命名)">
+                <input type="text" id="fileNameInput" placeholder="例: my_icon (空欄なら自動命名)">
                 <button class="btn-save" id="saveBtn">📥 PNG画像として保存する！</button>
             </div>
         </div>
@@ -260,9 +269,9 @@
             </div>
             <div class="hint">
                 【操作方法】<br>
-                ✨ **要素をクリック**：文字や画像をカスタム対象に選択！<br>
-                ✨ **要素をドラッグ**：選んだものを別々に移動 ↕↔<br>
-                ✨ **スライダー**：選んだものの回転・サイズを個別調整！
+                ✨ **要素をクリック**：選択してカスタム！<br>
+                ✨ **要素をドラッグ**：好きな場所に移動 ↕↔<br>
+                ✨ **スライダー**：横幅・縦幅・回転を別々に自由自在に調整！
             </div>
         </div>
 
@@ -272,31 +281,35 @@
         const canvas = document.getElementById('iconCanvas');
         const ctx = canvas.getContext('2d');
 
-        // 要素の取得
         const bgColorInput = document.getElementById('bgColor');
         const imageUpload = document.getElementById('imageUpload');
+        const shapeSelect = document.getElementById('shapeSelect');
+        const addShapeBtn = document.getElementById('addShapeBtn');
         const charInput = document.getElementById('charInput');
         const addBtn = document.getElementById('addBtn');
         const selectedLabel = document.getElementById('selectedLabel');
-        const textOnlyControls = document.getElementById('textOnlyControls');
-        const charColorInput = document.getElementById('charColor');
-        const scaleLabel = document.getElementById('scaleLabel');
-        const scaleSlider = document.getElementById('scaleSlider');
+        const colorControls = document.getElementById('colorControls');
+        const colorLabel = document.getElementById('colorLabel');
+        const elementColor = document.getElementById('elementColor');
+        const widthLabel = document.getElementById('widthLabel');
+        const widthSlider = document.getElementById('widthSlider');
+        const heightControlGroup = document.getElementById('heightControlGroup');
+        const heightLabel = document.getElementById('heightLabel');
+        const heightSlider = document.getElementById('heightSlider');
         const rotateSlider = document.getElementById('rotateSlider');
-        const scaleVal = document.getElementById('scaleVal');
+        const widthVal = document.getElementById('widthVal');
+        const heightVal = document.getElementById('heightVal');
         const rotateVal = document.getElementById('rotateVal');
         const deleteBtn = document.getElementById('deleteBtn');
         const fileNameInput = document.getElementById('fileNameInput');
         const saveBtn = document.getElementById('saveBtn');
 
-        // 全体の背景色
         let backgroundColor = '#0f172a';
 
-        // レイヤーデータ（文字と画像の両方を管理！）
+        // レイヤー管理（文字、画像、図形をすべてサポート！）
         let layers = [
-            { id: 1, type: 'text', text: 'A', x: 160, y: 240, scale: 220, rotation: -15, color: '#ff9f43' },
-            { id: 2, type: 'text', text: 'Z', x: 340, y: 260, scale: 220, rotation: 15, color: '#00ecbc' },
-            { id: 3, type: 'text', text: '👑', x: 256, y: 120, scale: 140, rotation: 0, color: '#ffffff' }
+            { id: 1, type: 'text', text: 'A', x: 160, y: 240, width: 220, height: 220, rotation: -15, color: '#ff9f43' },
+            { id: 2, type: 'shape', shapeType: 'rect', x: 340, y: 260, width: 180, height: 100, rotation: 15, color: '#00ecbc' }
         ];
 
         let selectedId = 1; 
@@ -304,36 +317,47 @@
         let dragTarget = null;
         let startX, startY;
 
-        // --- キャンバスの描画メイン関数 ---
         function drawIcon() {
-            // 背景塗りつぶし
             ctx.fillStyle = backgroundColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 全レイヤー描画（文字・画像）
             layers.forEach(layer => {
                 ctx.save();
-                
                 ctx.translate(layer.x, layer.y);
                 ctx.rotate((layer.rotation * Math.PI) / 180);
 
                 if (layer.type === 'text') {
-                    ctx.font = `bold ${layer.scale}px 'Helvetica Neue', Arial, sans-serif`;
+                    ctx.font = `bold ${layer.width}px 'Helvetica Neue', Arial, sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = layer.color;
                     ctx.fillText(layer.text, 0, 0);
                 } else if (layer.type === 'image' && layer.imgObj) {
-                    const w = layer.scale;
-                    const h = (layer.imgObj.height / layer.imgObj.width) * w;
-                    ctx.drawImage(layer.imgObj, -w / 2, -h / 2, w, h);
+                    // 画像は横幅(width)と縦幅(height)を別々に指定可能！
+                    ctx.drawImage(layer.imgObj, -layer.width / 2, -layer.height / 2, layer.width, layer.height);
+                } else if (layer.type === 'shape') {
+                    ctx.fillStyle = layer.color;
+                    if (layer.shapeType === 'rect') {
+                        ctx.fillRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
+                    } else if (layer.shapeType === 'circle') {
+                        ctx.beginPath();
+                        ctx.ellipse(0, 0, layer.width / 2, layer.height / 2, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (layer.shapeType === 'triangle') {
+                        ctx.beginPath();
+                        ctx.moveTo(0, -layer.height / 2);
+                        ctx.lineTo(layer.width / 2, layer.height / 2);
+                        ctx.lineTo(-layer.width / 2, layer.height / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
                 }
 
-                // 選択中の要素には、ガイドの点線円を描く
+                // 選択中のガイド表示
                 if (layer.id === selectedId) {
                     ctx.beginPath();
-                    const radius = layer.type === 'text' ? layer.scale / 1.4 : layer.scale / 1.5;
-                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    const maxR = Math.max(layer.width, layer.height) / 1.3;
+                    ctx.arc(0, 0, maxR, 0, Math.PI * 2);
                     ctx.strokeStyle = 'rgba(255, 159, 67, 0.7)';
                     ctx.lineWidth = 3;
                     ctx.setLineDash([6, 6]);
@@ -345,44 +369,56 @@
             });
         }
 
-        // --- UI表示とスライダー・数値の同期 ---
         function updateUI() {
             const currentLayer = layers.find(l => l.id === selectedId);
             if (currentLayer) {
                 if (currentLayer.type === 'text') {
                     selectedLabel.textContent = `選択中(文字):「${currentLayer.text}」`;
-                    textOnlyControls.style.display = 'block';
-                    charColorInput.value = currentLayer.color;
-                    scaleLabel.innerHTML = `② 文字の大きさ (最大600)：<span class="range-val" id="scaleVal">${currentLayer.scale}px</span>`;
-                } else {
+                    colorControls.style.display = 'block';
+                    colorLabel.textContent = '① 文字の色：';
+                    widthLabel.innerHTML = `② 文字サイズ (フォント)：<span class="range-val" id="widthVal">${currentLayer.width}px</span>`;
+                    heightControlGroup.style.display = 'none'; // 文字は縦横比固定
+                } else if (currentLayer.type === 'image') {
                     selectedLabel.textContent = `選択中(画像)`;
-                    textOnlyControls.style.display = 'none';
-                    scaleLabel.innerHTML = `② 画像の横幅 (最大600)：<span class="range-val" id="scaleVal">${currentLayer.scale}px</span>`;
+                    colorControls.style.display = 'none';
+                    widthLabel.innerHTML = `② 横幅 (Width)：<span class="range-val" id="widthVal">${currentLayer.width}px</span>`;
+                    heightControlGroup.style.display = 'block';
+                    heightLabel.innerHTML = `③ 縦幅 (Height)：<span class="range-val" id="heightVal">${currentLayer.height}px</span>`;
+                } else if (currentLayer.type === 'shape') {
+                    selectedLabel.textContent = `選択中(図形: ${currentLayer.shapeType})`;
+                    colorControls.style.display = 'block';
+                    colorLabel.textContent = '① 図形の色：';
+                    widthLabel.innerHTML = `② 横幅 (Width)：<span class="range-val" id="widthVal">${currentLayer.width}px</span>`;
+                    heightControlGroup.style.display = 'block';
+                    heightLabel.innerHTML = `③ 縦幅 (Height)：<span class="range-val" id="heightVal">${currentLayer.height}px</span>`;
                 }
                 
-                scaleSlider.value = currentLayer.scale;
+                elementColor.value = currentLayer.color || '#ffffff';
+                widthSlider.value = currentLayer.width;
+                heightSlider.value = currentLayer.height;
                 rotateSlider.value = currentLayer.rotation;
                 rotateVal.textContent = `${currentLayer.rotation}°`;
                 
-                scaleSlider.disabled = false;
+                widthSlider.disabled = false;
+                heightSlider.disabled = false;
                 rotateSlider.disabled = false;
                 deleteBtn.disabled = false;
             } else {
                 selectedLabel.textContent = `選択中: なし (要素をクリックしてな)`;
-                scaleVal.textContent = `---`;
+                widthVal.textContent = `---`;
+                heightVal.textContent = `---`;
                 rotateVal.textContent = `---`;
-                textOnlyControls.style.display = 'block';
-                scaleSlider.disabled = true;
+                widthSlider.disabled = true;
+                heightSlider.disabled = true;
                 rotateSlider.disabled = true;
                 deleteBtn.disabled = true;
             }
         }
 
-        // --- 画像アップロード処理 ---
+        // 画像アップロード
         imageUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
@@ -393,12 +429,13 @@
                         imgObj: img,
                         x: 256,
                         y: 256,
-                        scale: 200, // 初期サイズ
+                        width: 200,
+                        height: 200,
                         rotation: 0
                     };
                     layers.push(newLayer);
                     selectedId = newLayer.id;
-                    imageUpload.value = ''; // リセット
+                    imageUpload.value = '';
                     updateUI();
                     drawIcon();
                 };
@@ -407,31 +444,48 @@
             reader.readAsDataURL(file);
         });
 
-        // --- 文字追加 ---
+        // 図形追加
+        addShapeBtn.addEventListener('click', () => {
+            const shapeType = shapeSelect.value;
+            const newLayer = {
+                id: Date.now(),
+                type: 'shape',
+                shapeType: shapeType,
+                x: 256,
+                y: 256,
+                width: 150,
+                height: 150,
+                rotation: 0,
+                color: '#ff9f43'
+            };
+            layers.push(newLayer);
+            selectedId = newLayer.id;
+            updateUI();
+            drawIcon();
+        });
+
+        // 文字追加
         addBtn.addEventListener('click', () => {
             const val = charInput.value.trim();
             if (!val) return;
-
             const newLayer = {
                 id: Date.now(),
                 type: 'text',
                 text: val,
                 x: 256,
                 y: 256,
-                scale: 150,
+                width: 150,
+                height: 150,
                 rotation: 0,
                 color: '#ffffff'
             };
-
             layers.push(newLayer);
             selectedId = newLayer.id;
             charInput.value = '';
-            
             updateUI();
             drawIcon();
         });
 
-        // 背景色変更
         bgColorInput.addEventListener('input', (e) => {
             backgroundColor = e.target.value;
             drawIcon();
@@ -441,24 +495,26 @@
         function handleSliderInput() {
             const currentLayer = layers.find(l => l.id === selectedId);
             if (currentLayer) {
-                if (currentLayer.type === 'text') {
-                    currentLayer.color = charColorInput.value;
-                }
-                currentLayer.scale = parseInt(scaleSlider.value);
+                currentLayer.width = parseInt(widthSlider.value);
+                currentLayer.height = parseInt(heightSlider.value);
                 currentLayer.rotation = parseInt(rotateSlider.value);
+                if (currentLayer.type !== 'image') {
+                    currentLayer.color = elementColor.value;
+                }
                 
-                scaleVal.textContent = `${currentLayer.scale}px`;
+                widthVal.textContent = `${currentLayer.width}px`;
+                heightVal.textContent = `${currentLayer.height}px`;
                 rotateVal.textContent = `${currentLayer.rotation}°`;
                 
                 drawIcon();
             }
         }
 
-        charColorInput.addEventListener('input', handleSliderInput);
-        scaleSlider.addEventListener('input', handleSliderInput);
+        elementColor.addEventListener('input', handleSliderInput);
+        widthSlider.addEventListener('input', handleSliderInput);
+        heightSlider.addEventListener('input', handleSliderInput);
         rotateSlider.addEventListener('input', handleSliderInput);
 
-        // 要素削除
         deleteBtn.addEventListener('click', () => {
             layers = layers.filter(l => l.id !== selectedId);
             selectedId = layers.length > 0 ? layers[0].id : null;
@@ -466,7 +522,7 @@
             drawIcon();
         });
 
-        // --- ドラッグ＆クリック選択判定 ---
+        // ドラッグ移動
         function getCanvasCoords(e) {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -480,24 +536,20 @@
         function startDrag(e) {
             const coords = getCanvasCoords(e);
             let hitTarget = null;
-            
             for (let i = layers.length - 1; i >= 0; i--) {
                 const layer = layers[i];
                 const distance = Math.sqrt((coords.x - layer.x) ** 2 + (coords.y - layer.y) ** 2);
-                
-                if (distance < layer.scale / 1.1) {
+                if (distance < Math.max(layer.width, layer.height) / 1.1) {
                     hitTarget = layer;
                     break;
                 }
             }
-
             if (hitTarget) {
                 isDragging = true;
                 dragTarget = hitTarget;
                 selectedId = hitTarget.id;
                 startX = coords.x - dragTarget.x;
                 startY = coords.y - dragTarget.y;
-                
                 updateUI();
                 drawIcon();
             }
@@ -520,12 +572,11 @@
         canvas.addEventListener('mousedown', startDrag);
         window.addEventListener('mousemove', moveDrag);
         window.addEventListener('mouseup', stopDrag);
-
         canvas.addEventListener('touchstart', startDrag);
         canvas.addEventListener('touchmove', moveDrag, { passive: false });
         canvas.addEventListener('touchend', stopDrag);
 
-        // --- 💾 PNG保存処理 ---
+        // 保存処理
         saveBtn.addEventListener('click', () => {
             const tempSelectedId = selectedId;
             selectedId = null; 
@@ -544,7 +595,6 @@
             drawIcon();
         });
 
-        // 初期起動
         updateUI();
         drawIcon();
     </script>
