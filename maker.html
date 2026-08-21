@@ -103,14 +103,14 @@
 <body>
 
     <div class="container">
-        <h1>🌌 Neon Emoji Art Studio 🎨</h1>
+        <h1>🌌 Ver 1.5 Neon Emoji Art Studio 🎨</h1>
         <p>画像をアップロードして、鮮やかで綺麗な絵文字アートを生成しようぜ！(๑>◡<๑)</p>
         
         <div class="control-group">
             <input type="file" id="imageLoader" accept="image/*">
             <div>
                 <label>解像度: </label>
-                <input type="number" id="resolution" value="45" min="10" max="100">
+                <input type="number" id="resolution" value="45" min="1" max="1000">
             </div>
         </div>
 
@@ -150,6 +150,8 @@
             {emoji: "⬛", r: 0, g: 0, b: 0},
             {emoji: "🪨", r: 159, g: 160, b: 160},
             { emoji: "⚪", r: 240, g: 240, b: 240 },  // 白
+            { emoji: "⬜", r: 255, g: 255, b: 255},
+            { emoji: "✋", r: 239, g: 255, b: 0},
             { emoji: "🩷", r: 255, g: 105, b: 180 },  // ピンク
             { emoji: "⭐", r: 255, g: 215, b: 0 }     // ゴールド
         ];
