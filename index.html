@@ -199,7 +199,7 @@
             font-size: 3.5em;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             overflow: hidden;
-            user-select: none; /* 🚫 絵文字の選択を防止！ */
+            user-select: none; /* 🚫 選択防止 */
             -webkit-user-select: none;
         }
 
@@ -347,8 +347,10 @@
         <div id="profile" class="tab-content">
             
             <div class="profile-section">
-                <!-- 💡 画像にしたい時は <img src="download20260706072021.png" alt="Ykun"> に変えてな！ -->
-                <img src="download20260706072021.png" alt="Ykun">
+                <!-- 🛠️ ここを <div class="profile-avatar"> で囲んで修正したで！ -->
+                <div class="profile-avatar">
+                    <img src="download20260706072021.png" alt="Ykun">
+                </div>
                 <h2 class="profile-title">Ykun</h2>
             </div>
 
