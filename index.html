@@ -179,40 +179,87 @@
         /* 👤 自己紹介スタイル */
         .profile-section {
             text-align: center;
-            padding: 20px 0;
+            padding: 10px 0 30px;
         }
 
         .profile-avatar {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: #ddd;
-            margin: 0 auto 20px;
+            background: #eee;
+            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3em;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 3.5em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .profile-title {
-            font-size: 1.8em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin: 0 0 5px;
             color: #2c3e50;
         }
 
-        .profile-desc {
-            color: #555;
-            max-width: 600px;
-            margin: 0 auto 30px;
+        /* プロフィールリスト（グリッド） */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .profile-add-box {
-            background: #f0f3f6;
-            border: 2px dashed #cbd5e1;
-            padding: 30px;
+        .profile-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-item-icon {
+            font-size: 1.5em;
+            width: 35px;
+            text-align: center;
+        }
+
+        .profile-item-content {
+            flex: 1;
+        }
+
+        .profile-item-label {
+            font-size: 0.8em;
+            color: var(--sub-text);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .profile-item-value {
+            font-size: 1.05em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 2px;
+        }
+
+        .profile-item-value a {
+            color: #0984e3;
+            text-decoration: none;
+        }
+
+        .profile-item-value a:hover {
+            text-decoration: underline;
+        }
+
+        .secret-badge {
+            display: inline-block;
+            background: #ffeaa7;
+            color: #d63031;
+            padding: 2px 8px;
             border-radius: 12px;
-            color: #64748b;
+            font-size: 0.85em;
             font-weight: bold;
         }
 
@@ -282,13 +329,94 @@
             <div class="profile-section">
                 <div class="profile-avatar">😎</div>
                 <h2 class="profile-title">Ykun</h2>
-                <p class="profile-desc">動画配信やツール開発など、面白いことを色々発信中！🚀✨</p>
             </div>
 
-            <!-- 👇 ここにこれから自己紹介の内容をどんどん追加していってな！ -->
-            <div class="profile-add-box">
-                📝 【自己紹介追加予定エリア】<br>
-                ここに趣味や特技、活動内容などを追加していくで〜！
+            <div class="profile-grid">
+
+                <!-- 名前 -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">📛</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">名前</div>
+                        <div class="profile-item-value">Ykun</div>
+                    </div>
+                </div>
+
+                <!-- 誕生日 -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">🎂</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">誕生日</div>
+                        <div class="profile-item-value">9月30日</div>
+                    </div>
+                </div>
+
+                <!-- 血液型 -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">🩸</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">血液型</div>
+                        <div class="profile-item-value">O型</div>
+                    </div>
+                </div>
+
+                <!-- 身長 -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">📏</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">身長</div>
+                        <div class="profile-item-value"><span class="secret-badge">🔒 TikTok 1000フォロワーで公開！</span></div>
+                    </div>
+                </div>
+
+                <!-- 年齢 -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">🎂</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">年齢</div>
+                        <div class="profile-item-value"><span class="secret-badge">🔒 TikTok 1000フォロワーで公開！</span></div>
+                    </div>
+                </div>
+
+                <!-- 好きな都道府県 -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">🗾</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">好きな都道府県</div>
+                        <div class="profile-item-value">岐阜県、長野県、群馬県</div>
+                    </div>
+                </div>
+
+                <!-- 好きなもの -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">✨</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">好きなもの</div>
+                        <div class="profile-item-value">数学、プログラミング</div>
+                    </div>
+                </div>
+
+                <!-- 苦手なもの -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">😓</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">苦手なもの</div>
+                        <div class="profile-item-value">理科</div>
+                    </div>
+                </div>
+
+                <!-- 好きな人（2枠分使って大きく表示） -->
+                <div class="profile-item" style="grid-column: 1 / -1;">
+                    <div class="profile-item-icon">❤️</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">好きな人</div>
+                        <div class="profile-item-value">
+                            • Æž!フヒフム（<a href="https://www.youtube.com/@fuhifum" target="_blank">YouTube: @fuhifum</a>）<br>
+                            • Æž!みかんぼーる🍊（<a href="https://www.youtube.com/@%E3%81%BF%E3%81%8B%E3%82%93%E3%81%BC%E3%83%BC%E3%82%8B" target="_blank">YouTube: @みかんぼーる</a>）
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
