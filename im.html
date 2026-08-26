@@ -343,6 +343,17 @@
 
             <div class="control-group">
                 <div class="selected-badge" id="selectedLabel">選択中: なし (キャンバス上の要素をクリック！)</div>
+
+                <div id="fontControls" style="display:none; margin-bottom: 12px;">
+                    <label>🅰️ フォントの選択：</label>
+                    <select id="fontSelect">
+                        <option value="'Segoe UI', sans-serif">標準ゴシック (sans-serif)</option>
+                        <option value="'Yu Mincho', 'MS Mincho', serif">明朝体 (serif)</option>
+                        <option value="'Comic Sans MS', cursive">カジュアル (Comic Sans)</option>
+                        <option value="'Impact', sans-serif">インパクト (Impact)</option>
+                        <option value="'Courier New', monospace">等幅 (monospace)</option>
+                    </select>
+                </div>
                 
                 <div id="colorControls">
                     <label id="colorLabel">① 色（カラー）：</label>
@@ -378,7 +389,7 @@
                 💡 **操作方法**<br>
                 ✨ **パーツをクリック**：ピンポイントの形状判定で選択！<br>
                 ✨ **ドラッグ**：好きな位置へスムーズ移動 ↕↔<br>
-                ✨ **スライダー**：サイズ・回転・色を自由自在にカスタマイズ！
+                ✨ **スライダー**：サイズ・回転・色・フォントを自由自在にカスタマイズ！
             </div>
         </div>
 
@@ -395,6 +406,8 @@
         const charInput = document.getElementById('charInput');
         const addBtn = document.getElementById('addBtn');
         const selectedLabel = document.getElementById('selectedLabel');
+        const fontControls = document.getElementById('fontControls');
+        const fontSelect = document.getElementById('fontSelect');
         const colorControls = document.getElementById('colorControls');
         const colorLabel = document.getElementById('colorLabel');
         const elementColor = document.getElementById('elementColor');
@@ -416,7 +429,7 @@
         // 初期レイヤー
         let layers = [
             { id: 1, type: 'shape', shapeType: 'star', x: 256, y: 256, width: 280, height: 280, rotation: 0, color: '#ff9f43' },
-            { id: 2, type: 'text', text: '👑', x: 256, y: 240, width: 160, height: 160, rotation: 0, color: '#ffffff' }
+            { id: 2, type: 'text', text: '👑', fontFamily: "'Segoe UI', sans-serif", x: 256, y: 240, width: 160, height: 160, rotation: 0, color: '#ffffff' }
         ];
 
         let selectedId = 2; 
@@ -523,7 +536,8 @@
                 ctx.rotate((layer.rotation * Math.PI) / 180);
 
                 if (layer.type === 'text') {
-                    ctx.font = `bold ${layer.width}px 'Segoe UI', Arial, sans-serif`;
+                    const family = layer.fontFamily || "'Segoe UI', sans-serif";
+                    ctx.font = `bold ${layer.width}px ${family}`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = layer.color;
@@ -536,7 +550,7 @@
                     ctx.fill(path);
                 }
 
-                // 選択中パーツのガイドライン表示（パーツの形状にそった枠線に変更）
+                // 選択中パーツのガイドライン表示（パーツの形状にそった枠線）
                 if (layer.id === selectedId) {
                     ctx.strokeStyle = '#ff9f43';
                     ctx.lineWidth = 3;
@@ -566,12 +580,15 @@
             if (currentLayer) {
                 if (currentLayer.type === 'text') {
                     selectedLabel.textContent = `選択中 (文字): 「${currentLayer.text}」`;
+                    fontControls.style.display = 'block';
+                    fontSelect.value = currentLayer.fontFamily || "'Segoe UI', sans-serif";
                     colorControls.style.display = 'block';
                     colorLabel.textContent = '① 文字の色：';
                     widthLabel.innerHTML = `② 文字サイズ (フォント)：<span class="range-val" id="widthVal">${currentLayer.width}px</span>`;
                     heightControlGroup.style.display = 'none';
                 } else if (currentLayer.type === 'image') {
                     selectedLabel.textContent = `選択中 (画像)`;
+                    fontControls.style.display = 'none';
                     colorControls.style.display = 'none';
                     widthLabel.innerHTML = `② 横幅 (Width)：<span class="range-val" id="widthVal">${currentLayer.width}px</span>`;
                     heightControlGroup.style.display = 'block';
@@ -579,6 +596,7 @@
                 } else if (currentLayer.type === 'shape') {
                     const names = { rect:'四角形', circle:'円', triangle:'三角形', star:'星形', hexagon:'六角形', heart:'ハート', diamond:'ダイヤ', capsule:'カプセル' };
                     selectedLabel.textContent = `選択中 (図形: ${names[currentLayer.shapeType] || currentLayer.shapeType})`;
+                    fontControls.style.display = 'none';
                     colorControls.style.display = 'block';
                     colorLabel.textContent = '① 図形の色：';
                     widthLabel.innerHTML = `② 横幅 (Width)：<span class="range-val" id="widthVal">${currentLayer.width}px</span>`;
@@ -598,6 +616,7 @@
                 deleteBtn.disabled = false;
             } else {
                 selectedLabel.textContent = `選択中: なし (要素をクリックしてな)`;
+                fontControls.style.display = 'none';
                 widthVal.textContent = `---`;
                 heightVal.textContent = `---`;
                 rotateVal.textContent = `---`;
@@ -663,6 +682,7 @@
                 id: Date.now(),
                 type: 'text',
                 text: val,
+                fontFamily: fontSelect.value || "'Segoe UI', sans-serif",
                 x: 256,
                 y: 256,
                 width: 150,
@@ -675,6 +695,14 @@
             charInput.value = '';
             updateUI();
             drawIcon();
+        });
+
+        fontSelect.addEventListener('change', (e) => {
+            const currentLayer = layers.find(l => l.id === selectedId);
+            if (currentLayer && currentLayer.type === 'text') {
+                currentLayer.fontFamily = e.target.value;
+                drawIcon();
+            }
         });
 
         bgColorInput.addEventListener('input', (e) => {
