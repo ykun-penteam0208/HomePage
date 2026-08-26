@@ -536,15 +536,23 @@
                     ctx.fill(path);
                 }
 
-                // 選択中パーツのガイドライン表示
+                // 選択中パーツのガイドライン表示（パーツの形状にそった枠線に変更）
                 if (layer.id === selectedId) {
-                    ctx.beginPath();
-                    const maxR = Math.max(layer.width, layer.height) / 1.3;
-                    ctx.arc(0, 0, maxR, 0, Math.PI * 2);
                     ctx.strokeStyle = '#ff9f43';
                     ctx.lineWidth = 3;
                     ctx.setLineDash([6, 6]);
-                    ctx.stroke();
+
+                    if (layer.type === 'shape') {
+                        const path = createShapePath(layer);
+                        ctx.stroke(path);
+                    } else if (layer.type === 'image') {
+                        ctx.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
+                    } else if (layer.type === 'text') {
+                        const hw = (layer.width * 0.8) / 2;
+                        const hh = (layer.height * 0.8) / 2;
+                        ctx.strokeRect(-hw, -hh, hw * 2, hh * 2);
+                    }
+
                     ctx.setLineDash([]);
                 }
 
