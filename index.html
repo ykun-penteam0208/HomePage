@@ -41,6 +41,7 @@
             letter-spacing: 3px;
             font-weight: 800;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            user-select: none; /* 🚫 選択不可 */
         }
 
         header p {
@@ -72,6 +73,7 @@
             border-radius: 4px;
             font-size: 0.8em;
             text-transform: uppercase;
+            user-select: none; /* 🚫 選択不可 */
         }
 
         /* 📑 タブナビゲーション */
@@ -97,6 +99,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: inset 0 -2px 5px rgba(0,0,0,0.05);
+            user-select: none; /* 🚫 選択不可 */
         }
 
         .tab-btn.active {
@@ -169,6 +172,7 @@
             font-size: 0.9em;
             font-weight: bold;
             transition: background-color 0.2s ease, transform 0.1s ease;
+            user-select: none; /* 🚫 選択不可 */
         }
 
         .btn-link:hover {
@@ -182,6 +186,7 @@
             padding: 10px 0 30px;
         }
 
+        /* メインアイコン（丸型アバター） */
         .profile-avatar {
             width: 120px;
             height: 120px;
@@ -193,6 +198,15 @@
             justify-content: center;
             font-size: 3.5em;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            user-select: none; /* 🚫 絵文字の選択を防止！ */
+            -webkit-user-select: none;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .profile-title {
@@ -220,10 +234,13 @@
             gap: 12px;
         }
 
+        /* 🚫 リストの各絵文字アイコンを選択不可に！ */
         .profile-item-icon {
             font-size: 1.5em;
             width: 35px;
             text-align: center;
+            user-select: none; /* 🚫 選択不可 */
+            -webkit-user-select: none;
         }
 
         .profile-item-content {
@@ -235,6 +252,7 @@
             color: var(--sub-text);
             font-weight: bold;
             text-transform: uppercase;
+            user-select: none; /* 🚫 選択不可 */
         }
 
         .profile-item-value {
@@ -261,6 +279,7 @@
             border-radius: 12px;
             font-size: 0.85em;
             font-weight: bold;
+            user-select: none; /* 🚫 選択不可 */
         }
 
         /* 📸 🎥 メディアクラス */
@@ -280,6 +299,7 @@
             background-color: #1e1e1e;
             color: #a0a0a0;
             font-size: 0.9em;
+            user-select: none; /* 🚫 選択不可 */
         }
     </style>
 </head>
@@ -327,6 +347,7 @@
         <div id="profile" class="tab-content">
             
             <div class="profile-section">
+                <!-- 💡 画像にしたい時は <img src="icon.png" alt="Ykun"> に変えてな！ -->
                 <div class="profile-avatar">😎</div>
                 <h2 class="profile-title">Ykun</h2>
             </div>
@@ -405,7 +426,7 @@
                     </div>
                 </div>
 
-                <!-- 好きな人（2枠分使って大きく表示） -->
+                <!-- 好きな人 -->
                 <div class="profile-item" style="grid-column: 1 / -1;">
                     <div class="profile-item-icon">❤️</div>
                     <div class="profile-item-content">
@@ -431,7 +452,6 @@
     <!-- ⚙️ タブ切り替え用 JavaScript -->
     <script>
         function switchTab(tabId) {
-            // タブの表示切り替え
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
 
