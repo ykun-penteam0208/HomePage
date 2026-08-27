@@ -113,7 +113,8 @@
         }
 
         .control-group input[type="text"], 
-        .control-group select {
+        .control-group select,
+        textarea {
             width: 100%;
             padding: 10px 12px;
             background: #14171f;
@@ -127,7 +128,8 @@
         }
 
         .control-group input[type="text"]:focus, 
-        .control-group select:focus {
+        .control-group select:focus,
+        textarea:focus {
             border-color: var(--accent-primary);
         }
 
@@ -199,6 +201,14 @@
             margin-top: 20px;
         }
 
+        .json-zone {
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 18px;
+            border-radius: 14px;
+            margin-top: 20px;
+        }
+
         .btn-save {
             width: 100%;
             padding: 14px;
@@ -215,6 +225,22 @@
         .btn-save:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(255, 159, 67, 0.45);
+        }
+
+        .btn-json {
+            padding: 10px 14px;
+            background: #1e293b;
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+        }
+        .btn-json:hover {
+            background: var(--accent-primary);
+            color: #0f172a;
         }
 
         .btn-delete {
@@ -374,6 +400,25 @@
                 <button class="btn-delete" id="deleteBtn">❌ この要素を削除する</button>
             </div>
 
+            <div class="json-zone">
+                <label style="font-size: 0.85rem; font-weight: 700; color: var(--accent-primary); display: block; margin-bottom: 8px;">💾 JSONセーブ / 📋 コピペ復元 (サーバー非経由)</label>
+                
+                <textarea id="jsonTextArea" rows="3" placeholder="ここにJSONデータを貼り付けて「ロード」を押すか、「書き出し」で取得してな！" style="resize: vertical; font-family: monospace; font-size: 0.78rem;"></textarea>
+
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button class="btn-json" id="exportJsonBtn">📋 JSON生成＆コピー</button>
+                    <button class="btn-json" id="importJsonBtn">📤 JSONから復元</button>
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                    <button class="btn-json" id="downloadJsonBtn" style="border-color: #cbd5e1; color: #cbd5e1;">💾 JSONファイル保存</button>
+                    <label class="btn-json" style="border-color: #cbd5e1; color: #cbd5e1; text-align: center; line-height: 22px; margin: 0;">
+                        📁 JSONファイル開く
+                        <input type="file" id="uploadJsonFile" accept=".json" style="display: none;">
+                    </label>
+                </div>
+            </div>
+
             <div class="save-zone">
                 <label style="font-size: 0.85rem; font-weight: 700; color: #ff9f43; display: block; margin-bottom: 6px;">💾 保存するPNGのファイル名：</label>
                 <input type="text" id="fileNameInput" placeholder="例: my_icon (空欄なら自動命名)">
@@ -389,7 +434,8 @@
                 💡 **操作方法**<br>
                 ✨ **パーツをクリック**：ピンポイントの形状判定で選択！<br>
                 ✨ **ドラッグ**：好きな位置へスムーズ移動 ↕↔<br>
-                ✨ **スライダー**：サイズ・回転・色・フォントを自由自在にカスタマイズ！
+                ✨ **スライダー**：サイズ・回転・色・フォントを自由自在にカスタマイズ！<br>
+                ✨ **JSONセーブ**：コードをコピペ保存しておけばいつでも続きから作業可能！
             </div>
         </div>
 
@@ -423,6 +469,13 @@
         const deleteBtn = document.getElementById('deleteBtn');
         const fileNameInput = document.getElementById('fileNameInput');
         const saveBtn = document.getElementById('saveBtn');
+
+        // JSONセーブ・ロード関連要素
+        const jsonTextArea = document.getElementById('jsonTextArea');
+        const exportJsonBtn = document.getElementById('exportJsonBtn');
+        const importJsonBtn = document.getElementById('importJsonBtn');
+        const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+        const uploadJsonFile = document.getElementById('uploadJsonFile');
 
         let backgroundColor = '#0f172a';
 
@@ -493,7 +546,6 @@
                 }
 
                 case 'heart': {
-                    // ベジェ曲線によるハート型
                     path.moveTo(0, hh * 0.7);
                     path.bezierCurveTo(-hw * 1.2, 0, -hw * 0.6, -hh, 0, -hh * 0.3);
                     path.bezierCurveTo(hw * 0.6, -hh, hw * 1.2, 0, 0, hh * 0.7);
@@ -550,7 +602,7 @@
                     ctx.fill(path);
                 }
 
-                // 選択中パーツのガイドライン表示（パーツの形状にそった枠線）
+                // 選択中パーツのガイドライン表示
                 if (layer.id === selectedId) {
                     ctx.strokeStyle = '#ff9f43';
                     ctx.lineWidth = 3;
@@ -576,6 +628,8 @@
 
         // UI表示の切り替え
         function updateUI() {
+            bgColorInput.value = backgroundColor;
+
             const currentLayer = layers.find(l => l.id === selectedId);
             if (currentLayer) {
                 if (currentLayer.type === 'text') {
@@ -640,6 +694,7 @@
                         id: Date.now(),
                         type: 'image',
                         imgObj: img,
+                        imgSrc: event.target.result, // JSON保存用Base64データ
                         x: 256,
                         y: 256,
                         width: 200,
@@ -751,9 +806,8 @@
             };
         }
 
-        // --- ⭐ パーツごとの「正確な当たり判定 (Hit Test)」⭐ ---
+        // 精密判定
         function isPointInLayer(layer, pointX, pointY) {
-            // クリック座標をレイヤーのローカル座標系（回転・平行移動前）に変換
             const dx = pointX - layer.x;
             const dy = pointY - layer.y;
             const rad = (-layer.rotation * Math.PI) / 180;
@@ -765,13 +819,10 @@
 
             if (layer.type === 'shape') {
                 const path = createShapePath(layer);
-                // HTML5 CanvasのisPointInPathを使って精密判定！
                 return ctx.isPointInPath(path, localX, localY);
             } else if (layer.type === 'image') {
-                // 画像は四角いバウンディングボックス判定
                 return Math.abs(localX) <= hw && Math.abs(localY) <= hh;
             } else if (layer.type === 'text') {
-                // 文字はおおよそのサイズ領域判定
                 return Math.abs(localX) <= hw * 0.8 && Math.abs(localY) <= hh * 0.8;
             }
             return false;
@@ -781,7 +832,6 @@
             const coords = getCanvasCoords(e);
             let hitTarget = null;
 
-            // 最前面（配列の後ろ）から順に判定
             for (let i = layers.length - 1; i >= 0; i--) {
                 if (isPointInLayer(layers[i], coords.x, coords.y)) {
                     hitTarget = layers[i];
@@ -798,7 +848,6 @@
                 updateUI();
                 drawIcon();
             } else {
-                // 空白をクリックしたら選択解除
                 selectedId = null;
                 updateUI();
                 drawIcon();
@@ -826,10 +875,10 @@
         canvas.addEventListener('touchmove', moveDrag, { passive: false });
         canvas.addEventListener('touchend', stopDrag);
 
-        // 保存処理
+        // PNG画像保存処理
         saveBtn.addEventListener('click', () => {
             const tempSelectedId = selectedId;
-            selectedId = null; // 選択ガイド枠を消して描画
+            selectedId = null;
             drawIcon();
 
             const dataURL = canvas.toDataURL('image/png');
@@ -843,6 +892,124 @@
 
             selectedId = tempSelectedId;
             drawIcon();
+        });
+
+        // ==========================================
+        // ⭐ サーバー費完全0円！JSON セーブ ＆ ロード機能 ⭐
+        // ==========================================
+
+        // JSONデータ文字列の生成処理
+        function generateJsonString() {
+            const exportLayers = layers.map(l => {
+                const copy = { ...l };
+                delete copy.imgObj; // HTMLImageElementはシリアライズできないので削除
+                return copy;
+            });
+            const saveData = {
+                backgroundColor: backgroundColor,
+                layers: exportLayers
+            };
+            return JSON.stringify(saveData, null, 2);
+        }
+
+        // 1. JSON生成＆クリップボードコピー
+        exportJsonBtn.addEventListener('click', () => {
+            const jsonStr = generateJsonString();
+            jsonTextArea.value = jsonStr;
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                alert("📋 JSONデータをクリップボードにコピーしたで！\nメモ帳などに貼り付けて保存してな！");
+            }).catch(() => {
+                alert("JSONを生成したで！下のテキストエリアからコピペしてな！");
+            });
+        });
+
+        // 2. JSONファイルとしてダウンロード保存
+        downloadJsonBtn.addEventListener('click', () => {
+            const jsonStr = generateJsonString();
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `icon-project-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // JSONデータ構造をレイヤーオブジェクト群へと復元する関数
+        function loadJsonData(jsonData) {
+            try {
+                if (!jsonData || !Array.isArray(jsonData.layers)) {
+                    alert("⚠️ 無効なJSONフォーマットやで！");
+                    return;
+                }
+                backgroundColor = jsonData.backgroundColor || '#0f172a';
+                
+                const loadedLayers = [];
+                let pendingImages = 0;
+
+                jsonData.layers.forEach(l => {
+                    if (l.type === 'image' && l.imgSrc) {
+                        pendingImages++;
+                        const img = new Image();
+                        img.onload = () => {
+                            l.imgObj = img;
+                            pendingImages--;
+                            if (pendingImages === 0) {
+                                layers = loadedLayers;
+                                selectedId = layers.length > 0 ? layers[layers.length - 1].id : null;
+                                updateUI();
+                                drawIcon();
+                            }
+                        };
+                        img.src = l.imgSrc;
+                        loadedLayers.push(l);
+                    } else {
+                        loadedLayers.push(l);
+                    }
+                });
+
+                if (pendingImages === 0) {
+                    layers = loadedLayers;
+                    selectedId = layers.length > 0 ? layers[layers.length - 1].id : null;
+                    updateUI();
+                    drawIcon();
+                }
+                alert("✨ デザインを復元したで！");
+            } catch (err) {
+                alert("⚠️ JSONの解析に失敗したで。正しいデータか確認してな！");
+            }
+        }
+
+        // 3. テキストエリアのJSONから復元
+        importJsonBtn.addEventListener('click', () => {
+            const str = jsonTextArea.value.trim();
+            if (!str) {
+                alert("⚠️ テキストエリアにJSONを貼り付けてから押してな！");
+                return;
+            }
+            try {
+                const parsed = JSON.parse(str);
+                loadJsonData(parsed);
+            } catch (e) {
+                alert("⚠️ JSONの書き方が正しくないみたいやで！");
+            }
+        });
+
+        // 4. JSONファイルを開いて復元
+        uploadJsonFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    loadJsonData(parsed);
+                    jsonTextArea.value = event.target.result;
+                } catch (err) {
+                    alert("⚠️ ファイルが正しいJSONではありません！");
+                }
+            };
+            reader.readAsText(file);
         });
 
         // 初期表示
