@@ -88,7 +88,7 @@
 
         .tab-btn {
             flex: 1;
-5            max-width: 200px;
+            max-width: 200px;
             padding: 14px 20px;
             background: #e0e0e0;
             color: #555;
@@ -233,7 +233,7 @@
             gap: 12px;
         }
 
-        /* 🌟 左右に分ける専用クラス */
+        /* 🌟 左右に分ける専用クラス（スマホ対応版） */
         .profile-item-split {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
@@ -251,6 +251,7 @@
             align-items: center;
             gap: 12px;
             flex: 1;
+            min-width: 0; /* テキストのはみ出し防止 */
         }
 
         .profile-item-split-right {
@@ -258,11 +259,12 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .profile-item-split-right a img {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -278,12 +280,14 @@
             font-size: 1.5em;
             width: 35px;
             text-align: center;
+            flex-shrink: 0;
             user-select: none;
             -webkit-user-select: none;
         }
 
         .profile-item-content {
             flex: 1;
+            min-width: 0;
         }
 
         .profile-item-label {
@@ -299,6 +303,7 @@
             font-weight: bold;
             color: #2c3e50;
             margin-top: 2px;
+            word-break: break-all;
         }
 
         .profile-item-value a {
@@ -308,6 +313,25 @@
 
         .profile-item-value a:hover {
             text-decoration: underline;
+        }
+
+        /* 📱 スマホ画面（幅600px以下）のときの特別調整 */
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 20px 15px; /* スマホでパディングをスッキリさせる */
+            }
+
+            .profile-item-split {
+                flex-direction: column; /* スマホでは縦並びにしてはみ出しを防ぐ！ */
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .profile-item-split-right {
+                width: 100%;
+                justify-content: flex-start; /* アイコンを左側に並べる */
+                padding-left: 47px; /* アイコンの位置をテキストのインデントに合わせる */
+            }
         }
 
         /* 🦶 フッター */
