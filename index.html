@@ -427,12 +427,12 @@
                     </div>
                 </div>
 
-                <!-- 年齢 -->
+                <!-- 年齢（自動計算） -->
                 <div class="profile-item">
                     <div class="profile-item-icon">🎂</div>
                     <div class="profile-item-content">
                         <div class="profile-item-label">年齢</div>
-                        <div class="profile-item-value">9歳</div>
+                        <div class="profile-item-value" id="age">計算中...</div>
                     </div>
                 </div>
 
@@ -508,7 +508,7 @@
         <p>&copy; Ykun 🌐✨ All Rights Reserved.</p>
     </footer>
 
-    <!-- ⚙️ タブ切り替え用 JavaScript -->
+    <!-- ⚙️ タブ切り替え & 年齢自動計算用 JavaScript -->
     <script>
         function switchTab(tabId) {
             const contents = document.querySelectorAll('.tab-content');
@@ -520,6 +520,30 @@
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
+
+        // 🎂 毎年9月30日に年齢が自動で増える計算プログラム
+        function calculateAge() {
+            const birthYear = 2016; // 生まれた年（必要に応じて変更してな！）
+            const birthMonth = 9;   // 誕生月の9月
+            const birthDay = 30;    // 誕生日付の30日
+
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth() + 1; // 1〜12月
+            const currentDay = today.getDate();
+
+            let age = currentYear - birthYear;
+
+            // まだ今年の誕生日（9月30日）が来てなかったら、年齢を1引く
+            if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+                age--;
+            }
+
+            document.getElementById('age').textContent = age + '歳';
+        }
+
+        // ページを開いたときに年齢を計算して表示する
+        window.onload = calculateAge;
     </script>
 
 </body>
