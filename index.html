@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ykun NEWS - 最新情報やで！</title>
+    <!-- 🌟 ファビコン設定 -->
+    <link rel="icon" href="download20260706072021.png" type="image/png">
     <style>
         /* 🌟 全体スタイル */
         :root {
@@ -271,7 +273,6 @@
             transform: scale(1.08);
         }
 
-        /* 🚫 リストの各絵文字アイコンを選択不可に！ */
         .profile-item-icon {
             font-size: 1.5em;
             width: 35px;
@@ -389,6 +390,15 @@
                     </div>
                 </div>
 
+                <!-- 性別 -->
+                <div class="profile-item">
+                    <div class="profile-item-icon">👦</div>
+                    <div class="profile-item-content">
+                        <div class="profile-item-label">性別</div>
+                        <div class="profile-item-value">男</div>
+                    </div>
+                </div>
+
                 <!-- 血液型 -->
                 <div class="profile-item">
                     <div class="profile-item-icon">🩸</div>
@@ -403,7 +413,7 @@
                     <div class="profile-item-icon">📏</div>
                     <div class="profile-item-content">
                         <div class="profile-item-label">身長</div>
-                        <div class="profile-item-value">129.4cm</div>
+                        <div class="profile-item-value">129.3cm</div>
                     </div>
                 </div>
 
@@ -443,7 +453,7 @@
                     </div>
                 </div>
 
-                <!-- 好きな人（右側に画像を配置・タップでnichigetsu.htmlへ飛ぶ） -->
+                <!-- 好きな人 -->
                 <div class="profile-item-split">
                     <div class="profile-item-split-left">
                         <div class="profile-item-icon">❤️</div>
@@ -505,7 +515,6 @@
             event.currentTarget.classList.add('active');
         }
 
-        // 🎂 毎年9月30日に年齢が自動で増える計算プログラム
         function calculateAge() {
             const birthYear = 2016; 
             const birthMonth = 9;   
