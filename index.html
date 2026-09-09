@@ -234,6 +234,41 @@
             gap: 12px;
         }
 
+        /* 🌟 左右に分ける専用クラス（黄色で囲まれた部分用） */
+        .profile-item-split {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .profile-item-split-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .profile-item-split-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-item-split-right img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            border: 2px solid #fff;
+        }
+
         /* 🚫 リストの各絵文字アイコンを選択不可に！ */
         .profile-item-icon {
             font-size: 1.5em;
@@ -428,27 +463,37 @@
                     </div>
                 </div>
 
-                <!-- 好きな人 -->
-                <div class="profile-item" style="grid-column: 1 / -1;">
-                    <div class="profile-item-icon">❤️</div>
-                    <div class="profile-item-content">
-                        <div class="profile-item-label">好きな人</div>
-                        <div class="profile-item-value">
-                            • Æž!フヒフム（<a href="https://www.youtube.com/@fuhifum" target="_blank">YouTube: @fuhifum</a>）<br>
-                            • Æž!みかんぼーる🍊（<a href="https://www.youtube.com/@%E3%81%BF%E3%81%8B%E3%82%93%E3%81%BC%E3%83%BC%E3%82%8B" target="_blank">YouTube: @みかんぼーる</a>）<br>
-                            • <img src="f158e62e34e56f25dbb33835d25fcc2a~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="にちげつくんアイコン" style="width: 20px; height: 20px; border-radius: 50%; vertical-align: middle; margin-right: 4px;">にちげつくん(<a href="https://www.tiktok.com/@moon42301" target="_blank">@moon42301</a>)
+                <!-- 好きな人（右側に画像を配置） -->
+                <div class="profile-item-split">
+                    <div class="profile-item-split-left">
+                        <div class="profile-item-icon">❤️</div>
+                        <div class="profile-item-content">
+                            <div class="profile-item-label">好きな人</div>
+                            <div class="profile-item-value">
+                                • Æž!フヒフム（<a href="https://www.youtube.com/@fuhifum" target="_blank">YouTube: @fuhifum</a>）<br>
+                                • Æž!みかんぼーる🍊（<a href="https://www.youtube.com/@%E3%81%BF%E3%81%8B%E3%82%93%E3%81%BC%E3%83%BC%E3%82%8B" target="_blank">YouTube: @みかんぼーる</a>）<br>
+                                • にちげつくん（<a href="https://www.tiktok.com/@moon42301" target="_blank">@moon42301</a>）
+                            </div>
                         </div>
+                    </div>
+                    <div class="profile-item-split-right">
+                        <img src="f158e62e34e56f25dbb33835d25fcc2a~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="にちげつくんアイコン">
                     </div>
                 </div>
 
-                <!-- 信頼できる人 -->
-                <div class="profile-item" style="grid-column: 1 / -1;">
-                    <div class="profile-item-icon">🤝</div>
-                    <div class="profile-item-content">
-                        <div class="profile-item-label">信頼できる人</div>
-                        <div class="profile-item-value">
-                            <img src="f158e62e34e56f25dbb33835d25fcc2a~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="にちげつくんアイコン" style="width: 20px; height: 20px; border-radius: 50%; vertical-align: middle; margin-right: 4px;">にちげつくん(<a href="https://www.tiktok.com/@moon42301" target="_blank">@moon42301</a>)
+                <!-- 信頼できる人（右側に画像を配置） -->
+                <div class="profile-item-split">
+                    <div class="profile-item-split-left">
+                        <div class="profile-item-icon">🤝</div>
+                        <div class="profile-item-content">
+                            <div class="profile-item-label">信頼できる人</div>
+                            <div class="profile-item-value">
+                                にちげつくん（<a href="https://www.tiktok.com/@moon42301" target="_blank">@moon42301</a>）
+                            </div>
                         </div>
+                    </div>
+                    <div class="profile-item-split-right">
+                        <img src="f158e62e34e56f25dbb33835d25fcc2a~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="にちげつくんアイコン">
                     </div>
                 </div>
 
