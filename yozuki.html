@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夜月の自己紹介</title>
+    <!-- 🌟 ファビコン設定 -->
+    <link rel="icon" href="yozuki.jpeg" type="image/jpeg">
+    <style>
+        /* 🌟 全体スタイル */
+        :root {
+            --primary-color: #e50914;
+            --primary-hover: #b80710;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --sub-text: #7f8c8d;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", MeiYo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+        }
+
+        /* 📰 ヘッダー */
+        header {
+            background: linear-gradient(135deg, #1e1e1e 0%, #3a3a3a 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        /* 🔙 戻るボタン */
+        .back-btn-container {
+            max-width: 850px;
+            margin: 30px auto 0;
+            padding: 0 20px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #34495e;
+        }
+
+        /* 📦 コンテナ */
+        .container {
+            max-width: 850px;
+            margin: 15px auto 50px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        /* 👤 プロフィールセクション */
+        .profile-section {
+            text-align: center;
+            padding: 10px 0 30px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #eee;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-title {
+            font-size: 2em;
+            margin: 0 0 5px;
+            color: #2c3e50;
+        }
+
+        /* プロフィールグリッド */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .profile-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-item-icon {
+            font-size: 1.5em;
+            width: 35px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .profile-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-item-label {
+            font-size: 0.8em;
+            color: var(--sub-text);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .profile-item-value {
+            font-size: 1.05em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 2px;
+            word-break: break-all;
+        }
+
+        .profile-item-value a {
+            color: #0984e3;
+            text-decoration: none;
+        }
+
+        .profile-item-value a:hover {
+            text-decoration: underline;
+        }
+
+        /* 📱 スマホ対応 */
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+        }
+
+        /* 🦶 フッター */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background-color: #1e1e1e;
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ヘッダー -->
+    <header>
+        <h1>🌙 夜月の自己紹介</h1>
+    </header>
+
+    <div class="back-btn-container">
+        <a href="index.html" class="back-btn">⬅️ ホームに戻る</a>
+    </div>
+
+    <!-- コンテナ -->
+    <div class="container">
+
+        <div class="profile-section">
+            <div class="profile-avatar">
+                <img src="yozuki.jpeg" alt="夜月アイコン">
+            </div>
+            <h2 class="profile-title">夜月</h2>
+        </div>
+
+        <div class="profile-grid">
+
+            <!-- 名前 -->
+            <div class="profile-item">
+                <div class="profile-item-icon">📛</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">名前</div>
+                    <div class="profile-item-value">夜月</div>
+                </div>
+            </div>
+
+            <!-- 性別 -->
+            <div class="profile-item">
+                <div class="profile-item-icon">👦</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">性別</div>
+                    <div class="profile-item-value">男</div>
+                </div>
+            </div>
+
+            <!-- 学年 -->
+            <div class="profile-item">
+                <div class="profile-item-icon">🎒</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">学年</div>
+                    <div class="profile-item-value">5年生</div>
+                </div>
+            </div>
+
+            <!-- 誕生日 -->
+            <div class="profile-item">
+                <div class="profile-item-icon">🎂</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">誕生日</div>
+                    <div class="profile-item-value">9月8日</div>
+                </div>
+            </div>
+
+            <!-- 年齢（自動計算） -->
+            <div class="profile-item">
+                <div class="profile-item-icon">🎂</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">年齢</div>
+                    <div class="profile-item-value" id="age">計算中...</div>
+                </div>
+            </div>
+
+            <!-- 師匠 -->
+            <div class="profile-item" style="grid-column: 1 / -1;">
+                <div class="profile-item-icon">🥋</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">師匠</div>
+                    <div class="profile-item-value">@なぽりたんぼーる（TikTok）</div>
+                </div>
+            </div>
+
+            <!-- 1000人突破記念 -->
+            <div class="profile-item" style="grid-column: 1 / -1;">
+                <div class="profile-item-icon">🎉</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">1000人突破記念</div>
+                    <div class="profile-item-value">8月16日</div>
+                </div>
+            </div>
+
+            <!-- 好きなポーランドボールのみんな -->
+            <div class="profile-item" style="grid-column: 1 / -1;">
+                <div class="profile-item-icon">🌍</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">好きなポーランドボールのみんな</div>
+                    <div class="profile-item-value">
+                        • @AST.AOSUTO.TikTok<br>
+                        • @こかこーら<br>
+                        • @ykun.make
+                    </div>
+                </div>
+            </div>
+
+            <!-- サブアカウント -->
+            <div class="profile-item" style="grid-column: 1 / -1;">
+                <div class="profile-item-icon">📱</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">サブアカウント</div>
+                    <div class="profile-item-value">
+                        • @夜月サブ垢<br>
+                        • @夜月サブアカ「iPad」
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- フッター -->
+    <footer>
+        <p>&copy; Ykun 🌐✨ All Rights Reserved.</p>
+    </footer>
+
+    <!-- ⚙️ 年齢自動計算用 JavaScript -->
+    <script>
+        function calculateAge() {
+            const birthYear = 2015; // 5年生（現在10〜11歳）の目安
+            const birthMonth = 9;   
+            const birthDay = 8;    
+
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth() + 1; 
+            const currentDay = today.getDate();
+
+            let age = currentYear - birthYear;
+
+            if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+                age--;
+            }
+
+            document.getElementById('age').textContent = age + '歳';
+        }
+
+        window.onload = calculateAge;
+    </script>
+
+</body>
+</html>
