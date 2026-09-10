@@ -260,6 +260,7 @@
             justify-content: center;
             gap: 8px;
             flex-shrink: 0;
+            flex-wrap: wrap; /* アイコンが増えても折り返すようにするで！ */
         }
 
         .profile-item-split-right a img {
@@ -318,19 +319,19 @@
         /* 📱 スマホ画面（幅600px以下）のときの特別調整 */
         @media screen and (max-width: 600px) {
             .container {
-                padding: 20px 15px; /* スマホでパディングをスッキリさせる */
+                padding: 20px 15px;
             }
 
             .profile-item-split {
-                flex-direction: column; /* スマホでは縦並びにしてはみ出しを防ぐ！ */
+                flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
             }
 
             .profile-item-split-right {
                 width: 100%;
-                justify-content: flex-start; /* アイコンを左側に並べる */
-                padding-left: 47px; /* アイコンの位置をテキストのインデントに合わせる */
+                justify-content: flex-start;
+                padding-left: 47px;
             }
         }
 
@@ -488,7 +489,8 @@
                                 • Æž!フヒフム（<a href="https://www.youtube.com/@fuhifum" target="_blank">YouTube: @fuhifum</a>）<br>
                                 • Æž!みかんぼーる🍊（<a href="https://www.youtube.com/@%E3%81%BF%E3%81%8B%E3%82%93%E3%81%BC%E3%83%BC%E3%82%8B" target="_blank">YouTube: @みかんぼーる</a>）<br>
                                 • にちげつくん（<a href="https://www.tiktok.com/@moon42301" target="_blank">TikTok: @moon42301</a>）<br>
-                                • イタリー（<a href="https://www.tiktok.com/@gshdgdvb" target="_blank">TikTok: @gshdgdvb</a>）
+                                • イタリー（<a href="https://www.tiktok.com/@gshdgdvb" target="_blank">TikTok: @gshdgdvb</a>）<br>
+                                • 夜月（よずき）
                             </div>
                         </div>
                     </div>
@@ -498,6 +500,9 @@
                         </a>
                         <a href="italy.html" title="イタリーのページへ！">
                             <img src="9c4a2a6d78a639b6edda54ef8665719c~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="イタリーアイコン">
+                        </a>
+                        <a href="#" title="夜月のページへ！">
+                            <img src="yozuki.jpeg" alt="夜月アイコン">
                         </a>
                     </div>
                 </div>
@@ -510,7 +515,8 @@
                             <div class="profile-item-label">信頼できる人</div>
                             <div class="profile-item-value">
                                 • にちげつくん（<a href="https://www.tiktok.com/@moon42301" target="_blank">TikTok: @moon42301</a>）<br>
-                                • イタリー（<a href="https://www.tiktok.com/@gshdgdvb" target="_blank">TikTok: @gshdgdvb</a>）
+                                • イタリー（<a href="https://www.tiktok.com/@gshdgdvb" target="_blank">TikTok: @gshdgdvb</a>）<br>
+                                • 夜月（よずき）
                             </div>
                         </div>
                     </div>
@@ -520,6 +526,9 @@
                         </a>
                         <a href="italy.html" title="イタリーのページへ！">
                             <img src="9c4a2a6d78a639b6edda54ef8665719c~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="イタリーアイコン">
+                        </a>
+                        <a href="#" title="夜月のページへ！">
+                            <img src="yozuki.jpeg" alt="夜月アイコン">
                         </a>
                     </div>
                 </div>
