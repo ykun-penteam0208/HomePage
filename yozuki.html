@@ -30,20 +30,22 @@
         header {
             background: linear-gradient(135deg, #1e1e1e 0%, #3a3a3a 100%);
             color: white;
-            padding: 30px 20px;
+            padding: 40px 20px 20px;
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         header h1 {
             margin: 0;
-            font-size: 2.5em;
-            letter-spacing: 2px;
+            font-size: 2.8em;
+            letter-spacing: 3px;
             font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            user-select: none;
         }
 
-        /* 🔙 戻るボタン */
-        .back-btn-container {
+        /* 🔙 戻るボタンエリア */
+        .nav-back {
             max-width: 850px;
             margin: 30px auto 0;
             padding: 0 20px;
@@ -52,29 +54,30 @@
         .back-btn {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #2c3e50;
-            color: white;
+            background: #dfe6e9;
+            color: #2d3436;
             text-decoration: none;
             border-radius: 8px;
             font-weight: bold;
             transition: background 0.2s;
+            user-select: none;
         }
 
         .back-btn:hover {
-            background-color: #34495e;
+            background: #b2bec3;
         }
 
-        /* 📦 コンテナ */
+        /* 📦 コンテナ（メインコンテンツエリア） */
         .container {
             max-width: 850px;
-            margin: 15px auto 50px;
+            margin: 20px auto 50px;
             background: var(--card-bg);
             padding: 40px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
-        /* 👤 プロフィールセクション */
+        /* 👤 自己紹介スタイル */
         .profile-section {
             text-align: center;
             padding: 10px 0 30px;
@@ -89,8 +92,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            user-select: none;
         }
 
         .profile-avatar img {
@@ -105,7 +109,7 @@
             color: #2c3e50;
         }
 
-        /* プロフィールグリッド */
+        /* プロフィールリスト（グリッド） */
         .profile-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -128,12 +132,11 @@
             font-size: 1.5em;
             width: 35px;
             text-align: center;
-            flex-shrink: 0;
+            user-select: none;
         }
 
         .profile-item-content {
             flex: 1;
-            min-width: 0;
         }
 
         .profile-item-label {
@@ -141,6 +144,7 @@
             color: var(--sub-text);
             font-weight: bold;
             text-transform: uppercase;
+            user-select: none;
         }
 
         .profile-item-value {
@@ -148,7 +152,6 @@
             font-weight: bold;
             color: #2c3e50;
             margin-top: 2px;
-            word-break: break-all;
         }
 
         .profile-item-value a {
@@ -160,13 +163,6 @@
             text-decoration: underline;
         }
 
-        /* 📱 スマホ対応 */
-        @media screen and (max-width: 600px) {
-            .container {
-                padding: 20px 15px;
-            }
-        }
-
         /* 🦶 フッター */
         footer {
             text-align: center;
@@ -174,6 +170,7 @@
             background-color: #1e1e1e;
             color: #a0a0a0;
             font-size: 0.9em;
+            user-select: none;
         }
     </style>
 </head>
@@ -181,11 +178,12 @@
 
     <!-- ヘッダー -->
     <header>
-        <h1>🌙 夜月の自己紹介</h1>
+        <h1>夜月の自己紹介</h1>
     </header>
 
-    <div class="back-btn-container">
-        <a href="index.html" class="back-btn">⬅️ ホームに戻る</a>
+    <!-- 戻るボタン -->
+    <div class="nav-back">
+        <a href="index.html" class="back-btn">← メインページに戻る</a>
     </div>
 
     <!-- コンテナ -->
@@ -205,25 +203,7 @@
                 <div class="profile-item-icon">📛</div>
                 <div class="profile-item-content">
                     <div class="profile-item-label">名前</div>
-                    <div class="profile-item-value">夜月</div>
-                </div>
-            </div>
-
-            <!-- 性別 -->
-            <div class="profile-item">
-                <div class="profile-item-icon">👦</div>
-                <div class="profile-item-content">
-                    <div class="profile-item-label">性別</div>
-                    <div class="profile-item-value">男</div>
-                </div>
-            </div>
-
-            <!-- 学年 -->
-            <div class="profile-item">
-                <div class="profile-item-icon">🎒</div>
-                <div class="profile-item-content">
-                    <div class="profile-item-label">学年</div>
-                    <div class="profile-item-value">5年生</div>
+                    <div class="profile-item-value">夜月（<a href="https://www.tiktok.com/@yozuki2026" target="_blank">@yozuki2026</a>）</div>
                 </div>
             </div>
 
@@ -238,10 +218,19 @@
 
             <!-- 年齢（自動計算） -->
             <div class="profile-item">
-                <div class="profile-item-icon">🎂</div>
+                <div class="profile-item-icon">⏳</div>
                 <div class="profile-item-content">
                     <div class="profile-item-label">年齢</div>
                     <div class="profile-item-value" id="age">計算中...</div>
+                </div>
+            </div>
+
+            <!-- 性別 -->
+            <div class="profile-item">
+                <div class="profile-item-icon">👦</div>
+                <div class="profile-item-content">
+                    <div class="profile-item-label">性別</div>
+                    <div class="profile-item-value">男</div>
                 </div>
             </div>
 
@@ -251,7 +240,7 @@
                 <div class="profile-item-content">
                     <div class="profile-item-label">師匠</div>
                     <div class="profile-item-value">
-                        <a href="https://www.tiktok.com/@napolitanball" target="_blank">@なぽりたんぼーる</a>（TikTok）
+                        なぽりたん（<a href="https://www.tiktok.com/@dainipponteicok" target="_blank">@dainipponteicok</a>）（TikTok）
                     </div>
                 </div>
             </div>
@@ -265,14 +254,14 @@
                 </div>
             </div>
 
-            <!-- 好きなポーランドボールのみんな -->
+            <!-- 好きな人 -->
             <div class="profile-item" style="grid-column: 1 / -1;">
-                <div class="profile-item-icon">🌍</div>
+                <div class="profile-item-icon">💖</div>
                 <div class="profile-item-content">
-                    <div class="profile-item-label">好きなポーランドボールのみんな</div>
+                    <div class="profile-item-label">好きな人</div>
                     <div class="profile-item-value">
-                        • <a href="https://www.tiktok.com/@AST.AOSUTO.TikTok" target="_blank">@AST.AOSUTO.TikTok</a><br>
-                        • <a href="https://www.tiktok.com/@%E3%81%93%E3%81%8B%E3%81%8B%E3%83%BC%E3%82%89" target="_blank">@こかこーら</a><br>
+                        • <a href="https://www.tiktok.com/@ast.aosuto.jp.cb.pb" target="_blank">@ast.aosuto.jp.cb.pb</a><br>
+                        • こかこーら（<a href="https://www.tiktok.com/@kokako_ra822" target="_blank">@kokako_ra822</a>）<br>
                         • <a href="https://www.tiktok.com/@ykun.make" target="_blank">@ykun.make</a>
                     </div>
                 </div>
@@ -284,8 +273,8 @@
                 <div class="profile-item-content">
                     <div class="profile-item-label">サブアカウント</div>
                     <div class="profile-item-value">
-                        • <a href="https://www.tiktok.com/@%E5%A4%9C%E6%9C%88%E3%82%B5%E3%83%96%E5%BC%B9" target="_blank">@夜月サブ垢</a><br>
-                        • <a href="https://www.tiktok.com/@%E5%A4%9C%E6%9C%88%E3%82%B5%E3%83%96%E3%82%A2%E3%82%ABiPad" target="_blank">@夜月サブアカ「iPad」</a>
+                        • 夜月サブ垢（<a href="https://www.tiktok.com/@yozukisabu2026" target="_blank">@yozukisabu2026</a>）<br>
+                        • 夜月サブアカ「iPad」（<a href="https://www.tiktok.com/@ipad0157" target="_blank">@ipad0157</a>）
                     </div>
                 </div>
             </div>
