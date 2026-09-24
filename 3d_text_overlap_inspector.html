@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D文字重なり（立体交差領域）解析ツール</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  
+  <!-- Three.js and OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      overflow-x: hidden;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.8);
+    }
+  </style>
+</head>
+<body class="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col overflow-hidden select-none">
+
+  <!-- HEADER -->
+  <header class="h-14 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400 font-black text-lg">
+        3D
+      </div>
+      <div>
+        <h1 class="text-base font-black text-white flex items-center gap-2">
+          <span>3D文字重なり（立体交差領域）解析ツール</span>
+          <span class="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full font-mono font-normal">Swipe Engine v2</span>
+        </h1>
+      </div>
+    </div>
+
+    <!-- Top Action Buttons -->
+    <div class="flex items-center gap-2">
+      <button id="resetCamBtn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-300 transition flex items-center gap-1.5">
+        🎥 視点リセット
+      </button>
+      <button id="resetPosBtn" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-xs font-bold text-white rounded-lg shadow-lg shadow-orange-500/20 transition flex items-center gap-1.5">
+        🔄 全文字を中心配置
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+
+    <!-- 3D VIEWPORT CANVAS AREA -->
+    <div class="flex-1 relative bg-slate-950 overflow-hidden min-h-[300px]">
+      
+      <!-- Three.js Canvas Container -->
+      <div id="canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing touch-none"></div>
+
+      <!-- SWIPE MODE TOGGLE OVERLAY (PRIMARY OPERATIONAL CONTROL) -->
+      <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-lg border-2 border-indigo-500/50 p-1.5 rounded-2xl shadow-2xl flex items-center gap-1 z-10">
+        <span class="text-xs text-slate-400 font-bold px-2 hidden sm:inline">操作モード:</span>
+        <button id="modeCameraBtn" class="px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center gap-1.5 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
+          <span>🎥 視点移動 (Orbit)</span>
+        </button>
+        <button id="modeCharBtn" class="px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center gap-1.5 bg-slate-800 text-slate-400 hover:text-white">
+          <span>🔤 文字を直接スワイプ移動</span>
+        </button>
+      </div>
+
+      <!-- Quick Preset Toolbar -->
+      <div class="absolute bottom-4 left-4 flex flex-wrap items-center gap-2 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-800 shadow-xl z-10">
+        <span class="text-[11px] text-slate-400 px-2 font-semibold">プリセット:</span>
+        <button id="presetCenter" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">
+          完全重複 (100%)
+        </button>
+        <button id="presetX" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">
+          横ずらし (X軸)
+        </button>
+        <button id="presetZ" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">
+          奥行き段差 (Z軸)
+        </button>
+        <button id="presetSpiral" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">
+          3D 螺旋 (Spiral)
+        </button>
+      </div>
+
+      <!-- Overlap Status Bar -->
+      <div class="absolute top-4 right-4 bg-slate-900/90 backdrop-blur-md border border-slate-800 px-3 py-2 rounded-xl text-xs flex items-center gap-3 shadow-xl z-10">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+          <span class="font-bold text-slate-200">交差体積:</span>
+          <span id="overlapVolStat" class="mono text-rose-400 font-bold">0 voxels</span>
+        </div>
+      </div>
+
+      <!-- Swipe Guidance Hint Banner -->
+      <div id="swipeHintBanner" class="absolute bottom-16 left-1/2 -translate-x-1/2 bg-indigo-950/80 border border-indigo-500/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs text-indigo-200 flex items-center gap-2 shadow-lg pointer-events-none transition-all duration-300">
+        <span class="animate-bounce">👆</span>
+        <span id="swipeHintText">「視点移動」モードの時はマウスドラッグでカメラが回転します</span>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR / CONTROLS PANEL -->
+    <aside class="w-full md:w-80 bg-slate-900/95 border-t md:border-t-0 md:border-l border-slate-800 flex flex-col shrink-0 overflow-y-auto max-h-[45vh] md:max-h-full">
+      
+      <div class="p-4 space-y-5">
+
+        <!-- Text & Visual Settings -->
+        <div class="space-y-3">
+          <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>⚙️ 1. テキスト & 表示設定</span>
+          </h2>
+
+          <!-- Text Input -->
+          <div class="space-y-1">
+            <label for="textInput" class="text-xs font-semibold text-slate-300">表示テキスト</label>
+            <input
+              type="text"
+              id="textInput"
+              value="重ね合わせ"
+              placeholder="テキストを入力"
+              class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 font-bold tracking-wider"
+            />
+          </div>
+
+          <!-- Color Pickers -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300">文字基本カラー</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="baseColorInput" value="#38bdf8" class="w-8 h-8 bg-transparent border-0 cursor-pointer rounded" />
+                <span id="baseColorHex" class="mono text-xs text-slate-400">#38BDF8</span>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300">重なりハイライト</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="overlapColorInput" value="#ff0055" class="w-8 h-8 bg-transparent border-0 cursor-pointer rounded" />
+                <span id="overlapColorHex" class="mono text-xs text-rose-400 font-bold">#FF0055</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Render Style Selector -->
+          <div class="space-y-1">
+            <label for="renderModeSelect" class="text-xs font-semibold text-slate-300">3D描画スタイル</label>
+            <select
+              id="renderModeSelect"
+              class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+            >
+              <option value="glass">👻 半透明ガラス + 輝く交差領域</option>
+              <option value="solid">🧊 ソリッド (Solid Mesh)</option>
+              <option value="wireframe">🕸️ ワイヤーフレーム</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="border-slate-800" />
+
+        <!-- Selected Character Info & Quick Selector -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🎯 2. 操作対象の文字選択</span>
+            </h2>
+            <span id="selectedCharLabel" class="text-xs font-black bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">
+              選択: なし
+            </span>
+          </div>
+
+          <!-- Character Selector List Buttons -->
+          <div id="charListBtnContainer" class="flex flex-wrap gap-1.5">
+            <!-- Dynamically populated character selector buttons -->
+          </div>
+
+          <!-- Fine Tuning Rotations (Optional slider controls) -->
+          <div id="transformControls" class="space-y-2 bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-xs">
+            <div class="text-[11px] font-bold text-slate-400 mb-1">📐 文字の回転・角度調整 (微調整用)</div>
+            
+            <div class="space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-amber-400">Y 軸回転 (首振り)</span>
+                <span id="rotYVal" class="mono text-slate-300">0°</span>
+              </div>
+              <input type="range" id="rotYInput" min="-180" max="180" value="0" step="5" class="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-amber-500" />
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-amber-400">X 軸回転 (お辞儀)</span>
+                <span id="rotXVal" class="mono text-slate-300">0°</span>
+              </div>
+              <input type="range" id="rotXInput" min="-180" max="180" value="0" step="5" class="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-amber-500" />
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+  <script>
+    // --- APP STATE ---
+    const state = {
+      text: '重ね合わせ',
+      extrusionDepth: 12,
+      baseColor: '#38bdf8',
+      overlapColor: '#ff0055',
+      renderMode: 'glass',
+      swipeMode: 'camera', // 'camera' or 'character'
+      selectedCharIndex: 0,
+      characters: []
+    };
+
+    // --- THREE.JS SCENE SETUP ---
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x030712);
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 2000);
+    camera.position.set(0, 40, 240);
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    // Orbit Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 + 0.1;
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight1.position.set(100, 150, 100);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x38bdf8, 0.5);
+    dirLight2.position.set(-100, -50, -100);
+    scene.add(dirLight2);
+
+    const pointLight = new THREE.PointLight(0xff0055, 1, 200);
+    pointLight.position.set(0, 0, 0);
+    scene.add(pointLight);
+
+    // Helpers
+    const gridHelper = new THREE.GridHelper(300, 30, 0x475569, 0x1e293b);
+    gridHelper.position.y = -60;
+    scene.add(gridHelper);
+
+    // Group containers
+    const characterGroup = new THREE.Group();
+    const overlapGroup = new THREE.Group();
+    const selectionRingGroup = new THREE.Group();
+
+    scene.add(characterGroup);
+    scene.add(overlapGroup);
+    scene.add(selectionRingGroup);
+
+    const offscreenCanvas = document.createElement('canvas');
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+    const CANVAS_SIZE = 48;
+
+    function generateCharVoxels(char, depthLayers) {
+      offscreenCanvas.width = CANVAS_SIZE;
+      offscreenCanvas.height = CANVAS_SIZE;
+
+      offscreenCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      offscreenCtx.font = `900 ${CANVAS_SIZE * 0.78}px "Noto Sans JP", sans-serif`;
+      offscreenCtx.textAlign = 'center';
+      offscreenCtx.textBaseline = 'middle';
+      offscreenCtx.fillStyle = '#ffffff';
+      offscreenCtx.fillText(char, CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+
+      const imgData = offscreenCtx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE).data;
+      const localVoxels = [];
+      const step = 1;
+      const scaleFactor = 1.8;
+
+      const halfSize = CANVAS_SIZE / 2;
+      const halfDepth = depthLayers / 2;
+
+      for (let y = 0; y < CANVAS_SIZE; y += step) {
+        for (let x = 0; x < CANVAS_SIZE; x += step) {
+          const alpha = imgData[(y * CANVAS_SIZE + x) * 4 + 3];
+          if (alpha > 128) {
+            const lx = (x - halfSize) * scaleFactor;
+            const ly = (halfSize - y) * scaleFactor;
+
+            for (let z = 0; z < depthLayers; z += 1) {
+              const lz = (z - halfDepth) * scaleFactor;
+              localVoxels.push({ x: Math.round(lx), y: Math.round(ly), z: Math.round(lz) });
+            }
+          }
+        }
+      }
+
+      return localVoxels;
+    }
+
+    function initCharacters() {
+      while (characterGroup.children.length > 0) {
+        const obj = characterGroup.children.pop();
+        if (obj.geometry) obj.geometry.dispose();
+      }
+
+      const chars = state.text ? state.text.split('') : ['重ね合わせ'];
+      
+      const newChars = chars.map((c, idx) => {
+        const existing = state.characters[idx];
+        return {
+          id: idx,
+          char: c,
+          x: existing ? existing.x : 0,
+          y: existing ? existing.y : 0,
+          z: existing ? existing.z : 0,
+          rotX: existing ? existing.rotX : 0,
+          rotY: existing ? existing.rotY : 0,
+          voxels: [],
+          mesh: null
+        };
+      });
+
+      state.characters = newChars;
+      if (state.selectedCharIndex >= newChars.length) {
+        state.selectedCharIndex = Math.max(0, newChars.length - 1);
+      }
+
+      updateCharacterMeshes();
+      updateUI();
+    }
+
+    function updateCharacterMeshes() {
+      while (characterGroup.children.length > 0) {
+        const obj = characterGroup.children.pop();
+        if (obj.geometry) obj.geometry.dispose();
+      }
+
+      const cubeGeo = new THREE.BoxGeometry(1.7, 1.7, 1.7);
+
+      let mat;
+      if (state.renderMode === 'glass') {
+        mat = new THREE.MeshPhysicalMaterial({
+          color: new THREE.Color(state.baseColor),
+          transparent: true,
+          opacity: 0.35,
+          roughness: 0.1,
+          transmission: 0.6,
+          thickness: 1.2
+        });
+      } else if (state.renderMode === 'wireframe') {
+        mat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(state.baseColor),
+          wireframe: true
+        });
+      } else {
+        mat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(state.baseColor),
+          roughness: 0.4,
+          metalness: 0.2
+        });
+      }
+
+      state.characters.forEach((charObj) => {
+        charObj.voxels = generateCharVoxels(charObj.char, state.extrusionDepth);
+
+        const count = charObj.voxels.length;
+        if (count === 0) return;
+
+        const instancedMesh = new THREE.InstancedMesh(cubeGeo, mat, count);
+        const dummy = new THREE.Object3D();
+
+        charObj.voxels.forEach((v, i) => {
+          dummy.position.set(v.x, v.y, v.z);
+          dummy.updateMatrix();
+          instancedMesh.setMatrixAt(i, dummy.matrix);
+        });
+
+        instancedMesh.instanceMatrix.needsUpdate = true;
+        instancedMesh.position.set(charObj.x, charObj.y, charObj.z);
+        instancedMesh.rotation.x = THREE.MathUtils.degToRad(charObj.rotX);
+        instancedMesh.rotation.y = THREE.MathUtils.degToRad(charObj.rotY);
+
+        instancedMesh.userData = { charIndex: charObj.id };
+
+        charObj.mesh = instancedMesh;
+        characterGroup.add(instancedMesh);
+      });
+
+      calculate3DOverlaps();
+      updateSelectionHighlight();
+    }
+
+    function calculate3DOverlaps() {
+      while (overlapGroup.children.length > 0) {
+        const obj = overlapGroup.children.pop();
+        if (obj.geometry) obj.geometry.dispose();
+      }
+
+      if (state.characters.length < 2) {
+        document.getElementById('overlapVolStat').textContent = '0 voxels';
+        return;
+      }
+
+      const worldGrid = new Map();
+
+      state.characters.forEach((charObj) => {
+        if (!charObj.voxels) return;
+
+        const radX = THREE.MathUtils.degToRad(charObj.rotX);
+        const radY = THREE.MathUtils.degToRad(charObj.rotY);
+        const euler = new THREE.Euler(radX, radY, 0, 'XYZ');
+
+        charObj.voxels.forEach((v) => {
+          const p = new THREE.Vector3(v.x, v.y, v.z);
+          p.applyEuler(euler);
+          p.x += charObj.x;
+          p.y += charObj.y;
+          p.z += charObj.z;
+
+          const gx = Math.round(p.x / 1.8);
+          const gy = Math.round(p.y / 1.8);
+          const gz = Math.round(p.z / 1.8);
+          const key = `${gx},${gy},${gz}`;
+
+          if (!worldGrid.has(key)) {
+            worldGrid.set(key, { set: new Set([charObj.id]), gx, gy, gz });
+          } else {
+            worldGrid.get(key).set.add(charObj.id);
+          }
+        });
+      });
+
+      const overlapVoxels = [];
+      worldGrid.forEach((entry) => {
+        if (entry.set.size >= 2) {
+          overlapVoxels.push(entry);
+        }
+      });
+
+      document.getElementById('overlapVolStat').textContent = `${overlapVoxels.length} voxels`;
+
+      if (overlapVoxels.length === 0) return;
+
+      const cubeGeo = new THREE.BoxGeometry(1.85, 1.85, 1.85);
+      const overlapMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(state.overlapColor),
+        emissive: new THREE.Color(state.overlapColor),
+        emissiveIntensity: 0.8,
+        roughness: 0.2,
+        metalness: 0.8
+      });
+
+      const instancedOverlap = new THREE.InstancedMesh(cubeGeo, overlapMat, overlapVoxels.length);
+      const dummy = new THREE.Object3D();
+
+      overlapVoxels.forEach((entry, i) => {
+        dummy.position.set(entry.gx * 1.8, entry.gy * 1.8, entry.gz * 1.8);
+        dummy.updateMatrix();
+        instancedOverlap.setMatrixAt(i, dummy.matrix);
+      });
+
+      instancedOverlap.instanceMatrix.needsUpdate = true;
+      overlapGroup.add(instancedOverlap);
+
+      if (overlapVoxels.length > 0) {
+        const center = overlapVoxels[0];
+        pointLight.position.set(center.gx * 1.8, center.gy * 1.8, center.gz * 1.8);
+        pointLight.color.set(state.overlapColor);
+      }
+    }
+
+    function updateSelectionHighlight() {
+      while (selectionRingGroup.children.length > 0) {
+        const obj = selectionRingGroup.children.pop();
+        if (obj.geometry) obj.geometry.dispose();
+      }
+
+      const activeChar = state.characters[state.selectedCharIndex];
+      if (!activeChar) return;
+
+      const ringGeo = new THREE.RingGeometry(22, 25, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xf59e0b,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2;
+      ringMesh.position.set(activeChar.x, activeChar.y - 25, activeChar.z);
+
+      selectionRingGroup.add(ringMesh);
+    }
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const dragPlane = new THREE.Plane();
+    const planeIntersectPoint = new THREE.Vector3();
+
+    let isDraggingChar = false;
+    let dragOffset = new THREE.Vector3();
+
+    // Precise clientX/clientY normalizer accounting for canvas bounding rect
+    function getNormalizedMouse(e) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      let clientX = 0;
+      let clientY = 0;
+
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      return {
+        x: ((clientX - rect.left) / rect.width) * 2 - 1,
+        y: -((clientY - rect.top) / rect.height) * 2 + 1
+      };
+    }
+
+    function onPointerDown(e) {
+      // If we are in camera mode, let OrbitControls handle everything natively
+      if (state.swipeMode === 'camera') return;
+
+      const m = getNormalizedMouse(e);
+      mouse.x = m.x;
+      mouse.y = m.y;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      // 1. Raycast character meshes to select target character
+      const intersects = raycaster.intersectObjects(characterGroup.children);
+      if (intersects.length > 0) {
+        const hitMesh = intersects[0].object;
+        if (hitMesh.userData && hitMesh.userData.charIndex !== undefined) {
+          state.selectedCharIndex = hitMesh.userData.charIndex;
+          updateUI();
+          updateSelectionHighlight();
+        }
+      }
+
+      // 2. Handle character drag in 'character' mode
+      const currentChar = state.characters[state.selectedCharIndex];
+      if (currentChar && currentChar.mesh) {
+        isDraggingChar = true;
+
+        // Create drag plane facing the camera at the character's depth
+        const cameraDir = new THREE.Vector3();
+        camera.getWorldDirection(cameraDir);
+        dragPlane.setFromNormalAndCoplanarPoint(cameraDir.negate(), currentChar.mesh.position);
+
+        if (raycaster.ray.intersectPlane(dragPlane, planeIntersectPoint)) {
+          dragOffset.copy(currentChar.mesh.position).sub(planeIntersectPoint);
+        }
+      }
+    }
+
+    function onPointerMove(e) {
+      if (!isDraggingChar || state.swipeMode !== 'character') return;
+
+      const m = getNormalizedMouse(e);
+      mouse.x = m.x;
+      mouse.y = m.y;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      if (raycaster.ray.intersectPlane(dragPlane, planeIntersectPoint)) {
+        const currentChar = state.characters[state.selectedCharIndex];
+        if (currentChar) {
+          const newPos = planeIntersectPoint.clone().add(dragOffset);
+          
+          currentChar.x = Math.round(newPos.x);
+          currentChar.y = Math.round(newPos.y);
+          currentChar.z = Math.round(newPos.z);
+
+          if (currentChar.mesh) {
+            currentChar.mesh.position.set(currentChar.x, currentChar.y, currentChar.z);
+          }
+
+          calculate3DOverlaps();
+          updateSelectionHighlight();
+        }
+      }
+    }
+
+    function onPointerUp() {
+      isDraggingChar = false;
+    }
+
+    // Attach listeners to the canvas container or window as appropriate
+    const dom = renderer.domElement;
+    dom.addEventListener('pointerdown', onPointerDown);
+    dom.addEventListener('pointermove', onPointerMove);
+    dom.addEventListener('pointerup', onPointerUp);
+    dom.addEventListener('pointerleave', onPointerUp);
+
+    dom.addEventListener('touchstart', (e) => {
+      onPointerDown(e);
+    }, { passive: true });
+    
+    dom.addEventListener('touchmove', (e) => {
+      onPointerMove(e);
+    }, { passive: true });
+
+    dom.addEventListener('touchend', onPointerUp);
+
+    function setSwipeMode(mode) {
+      state.swipeMode = mode;
+
+      const cameraBtn = document.getElementById('modeCameraBtn');
+      const charBtn = document.getElementById('modeCharBtn');
+      const hintText = document.getElementById('swipeHintText');
+
+      if (mode === 'camera') {
+        controls.enabled = true; // Enable camera rotation
+        cameraBtn.className = "px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center gap-1.5 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30";
+        charBtn.className = "px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center gap-1.5 bg-slate-800 text-slate-400 hover:text-white";
+        hintText.textContent = "「視点移動」モードの時はマウスドラッグでカメラが回転します";
+      } else {
+        controls.enabled = false; // Disable camera so dragging moves characters directly
+        charBtn.className = "px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30";
+        cameraBtn.className = "px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center gap-1.5 bg-slate-800 text-slate-400 hover:text-white";
+        hintText.textContent = "「文字を直接スワイプ移動」モードです。文字をドラッグして動かしてください！";
+      }
+    }
+
+    document.getElementById('modeCameraBtn').addEventListener('click', () => setSwipeMode('camera'));
+    document.getElementById('modeCharBtn').addEventListener('click', () => setSwipeMode('character'));
+
+    function updateUI() {
+      const btnContainer = document.getElementById('charListBtnContainer');
+      btnContainer.innerHTML = '';
+
+      state.characters.forEach((charObj, idx) => {
+        const btn = document.createElement('button');
+        const isSelected = idx === state.selectedCharIndex;
+        btn.className = `px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1 ${
+          isSelected
+            ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
+            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+        }`;
+        btn.innerHTML = `<span>${charObj.char}</span><span class="text-[10px] opacity-70">#${idx + 1}</span>`;
+        btn.onclick = () => {
+          state.selectedCharIndex = idx;
+          updateUI();
+          updateSelectionHighlight();
+        };
+        btnContainer.appendChild(btn);
+      });
+
+      const selectedChar = state.characters[state.selectedCharIndex];
+      const selectedLabel = document.getElementById('selectedCharLabel');
+
+      if (selectedChar) {
+        selectedLabel.textContent = `選択: [ ${selectedChar.char} ] (#${selectedChar.id + 1})`;
+        document.getElementById('rotYInput').value = selectedChar.rotY;
+        document.getElementById('rotYVal').textContent = `${selectedChar.rotY}°`;
+        document.getElementById('rotXInput').value = selectedChar.rotX;
+        document.getElementById('rotXVal').textContent = `${selectedChar.rotX}°`;
+      } else {
+        selectedLabel.textContent = '選択: なし';
+      }
+    }
+
+    // Input Listeners
+    document.getElementById('textInput').addEventListener('input', (e) => {
+      state.text = e.target.value;
+      initCharacters();
+    });
+
+    document.getElementById('baseColorInput').addEventListener('input', (e) => {
+      state.baseColor = e.target.value;
+      document.getElementById('baseColorHex').textContent = e.target.value.toUpperCase();
+      updateCharacterMeshes();
+    });
+
+    document.getElementById('overlapColorInput').addEventListener('input', (e) => {
+      state.overlapColor = e.target.value;
+      document.getElementById('overlapColorHex').textContent = e.target.value.toUpperCase();
+      calculate3DOverlaps();
+    });
+
+    document.getElementById('renderModeSelect').addEventListener('change', (e) => {
+      state.renderMode = e.target.value;
+      updateCharacterMeshes();
+    });
+
+    // Rotation Sliders
+    document.getElementById('rotYInput').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      document.getElementById('rotYVal').textContent = `${val}°`;
+      const currentChar = state.characters[state.selectedCharIndex];
+      if (currentChar) {
+        currentChar.rotY = val;
+        if (currentChar.mesh) {
+          currentChar.mesh.rotation.y = THREE.MathUtils.degToRad(val);
+        }
+        calculate3DOverlaps();
+      }
+    });
+
+    document.getElementById('rotXInput').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      document.getElementById('rotXVal').textContent = `${val}°`;
+      const currentChar = state.characters[state.selectedCharIndex];
+      if (currentChar) {
+        currentChar.rotX = val;
+        if (currentChar.mesh) {
+          currentChar.mesh.rotation.x = THREE.MathUtils.degToRad(val);
+        }
+        calculate3DOverlaps();
+      }
+    });
+
+    // Preset Buttons
+    document.getElementById('resetPosBtn').addEventListener('click', () => {
+      state.characters.forEach((c) => {
+        c.x = 0; c.y = 0; c.z = 0; c.rotX = 0; c.rotY = 0;
+      });
+      updateCharacterMeshes();
+      updateUI();
+    });
+
+    document.getElementById('presetCenter').addEventListener('click', () => {
+      state.characters.forEach((c) => {
+        c.x = 0; c.y = 0; c.z = 0; c.rotX = 0; c.rotY = 0;
+      });
+      updateCharacterMeshes();
+      updateUI();
+    });
+
+    document.getElementById('presetX').addEventListener('click', () => {
+      state.characters.forEach((c, idx) => {
+        c.x = (idx - (state.characters.length - 1) / 2) * 28;
+        c.y = 0; c.z = 0; c.rotX = 0; c.rotY = 0;
+      });
+      updateCharacterMeshes();
+      updateUI();
+    });
+
+    document.getElementById('presetZ').addEventListener('click', () => {
+      state.characters.forEach((c, idx) => {
+        c.x = (idx - (state.characters.length - 1) / 2) * 12;
+        c.y = 0;
+        c.z = (idx - (state.characters.length - 1) / 2) * 24;
+        c.rotX = 0; c.rotY = 0;
+      });
+      updateCharacterMeshes();
+      updateUI();
+    });
+
+    document.getElementById('presetSpiral').addEventListener('click', () => {
+      state.characters.forEach((c, idx) => {
+        const angle = idx * 0.8;
+        const radius = 25;
+        c.x = Math.cos(angle) * radius;
+        c.y = (idx - state.characters.length / 2) * 15;
+        c.z = Math.sin(angle) * radius;
+        c.rotY = -angle * (180 / Math.PI);
+        c.rotX = 0;
+      });
+      updateCharacterMeshes();
+      updateUI();
+    });
+
+    document.getElementById('resetCamBtn').addEventListener('click', () => {
+      camera.position.set(0, 40, 240);
+      controls.target.set(0, 0, 0);
+      controls.update();
+    });
+
+    // Window Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    let clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const elapsedTime = clock.getElapsedTime();
+
+      if (overlapGroup.children.length > 0) {
+        const pulse = 0.8 + Math.sin(elapsedTime * 4) * 0.25;
+        overlapGroup.children.forEach((mesh) => {
+          if (mesh.material && mesh.material.emissiveIntensity !== undefined) {
+            mesh.material.emissiveIntensity = pulse;
+          }
+        });
+      }
+
+      if (state.swipeMode === 'camera') {
+        controls.update();
+      }
+      
+      renderer.render(scene, camera);
+    }
+
+    // --- INITIAL STARTUP ---
+    window.onload = () => {
+      initCharacters();
+      setSwipeMode('camera');
+      animate();
+    };
+  </script>
+</body>
+</html>
