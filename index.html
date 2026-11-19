@@ -380,13 +380,13 @@
 
             <div class="article-card">
                 <div class="article-date">📅 公開日: 2026年8月20日</div>
-                <p>夏休み終わり悲しい…😭 画像をテキストにするツールもよろしく！TiktokもYoutubeも気合で頑張るぞ〜！！🔥💪</p>
+                <p>画像をテキストにするツールもよろしく！TiktokもYoutubeも気合で頑張るぞ〜！！🔥💪</p>
                 <a href="maker.html" class="btn-link" style="background-color: #00b894;">🛠️ ツールはこちら！</a>
             </div>
             <div class="article-card">
                 <div class="article-date">📅 公開日: 2026年9月23日</div>
                 <p>なにこれ</p>
-                <a href="3d_text_overlap_inspector.html" class="btn-link" style="background-color: #00b894;">🛠️ なんこれ</a>
+                <a href="3d_text_overlap_inspector.html" class="btn-link" style="background-color: #00b894;">🛠️ 3D！！</a>
             </div>
         </div>
 
@@ -443,7 +443,7 @@
                     <div class="profile-item-icon">📏</div>
                     <div class="profile-item-content">
                         <div class="profile-item-label">身長</div>
-                        <div class="profile-item-value">129.3cm</div>
+                        <div class="profile-item-value">教えないよ</div>
                     </div>
                 </div>
 
@@ -452,7 +452,7 @@
                     <div class="profile-item-icon">🎂</div>
                     <div class="profile-item-content">
                         <div class="profile-item-label">年齢</div>
-                        <div class="profile-item-value" id="age">計算中...</div>
+                        <div class="profile-item-value" id="age">教えないよ</div>
                     </div>
                 </div>
 
@@ -498,17 +498,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="profile-item-split-right">
-                        <a href="nichigetsu.html" title="にちげつくんのページへ！">
-                            <img src="f158e62e34e56f25dbb33835d25fcc2a~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="にちげつくんアイコン">
-                        </a>
-                        <a href="italy.html" title="イタリーのページへ！">
-                            <img src="9c4a2a6d78a639b6edda54ef8665719c~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="イタリーアイコン">
-                        </a>
-                        <a href="yozuki.html" title="夜月のページへ！">
-                            <img src="yozuki.jpeg" alt="夜月アイコン">
-                        </a>
-                    </div>
                 </div>
 
                 <!-- 信頼できる人 -->
@@ -524,17 +513,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="profile-item-split-right">
-                        <a href="nichigetsu.html" title="にちげつくんのページへ！">
-                            <img src="f158e62e34e56f25dbb33835d25fcc2a~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="にちげつくんアイコン">
-                        </a>
-                        <a href="italy.html" title="イタリーのページへ！">
-                            <img src="9c4a2a6d78a639b6edda54ef8665719c~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="イタリーアイコン">
-                        </a>
-                        <a href="yozuki.html" title="夜月のページへ！">
-                            <img src="yozuki.jpeg" alt="夜月アイコン">
-                        </a>
-                    </div>
+                    
                 </div>
 
             </div>
@@ -561,24 +540,6 @@
             event.currentTarget.classList.add('active');
         }
 
-        function calculateAge() {
-            const birthYear = 2016; 
-            const birthMonth = 9;   
-            const birthDay = 30;    
-
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth() + 1; 
-            const currentDay = today.getDate();
-
-            let age = currentYear - birthYear;
-
-            if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
-                age--;
-            }
-
-            document.getElementById('age').textContent = age + '歳';
-        }
 
         window.onload = calculateAge;
     </script>
